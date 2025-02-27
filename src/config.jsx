@@ -14,9 +14,9 @@ const projectId = '3268c03bffd8e52c1b26452048d2ce4c';
 
 // 3. Optional metadata for verification and branding
 const metadata = {
-  name: 'My Dapp',
+  name: 'Chama Dapp',
   description: 'A Blockchain Table Banking Savings Dapp',
-  url: 'https://chama.com', 
+  url: 'https://chama-dapp.vercel.app/', 
   icons: ['https://ibb.co/gZbByZLZ'],
 };
 

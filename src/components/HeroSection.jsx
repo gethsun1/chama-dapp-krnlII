@@ -1,3 +1,5 @@
+
+
 // src/components/HeroSection.jsx
 import React from 'react';
 import {
@@ -64,7 +66,10 @@ const HeroSection = () => {
               variant="h5"
               component="p"
               gutterBottom
-              sx={{ color: 'primary.main', minHeight: '3rem' }}
+              sx={{ color: 'primary.main', 
+                        minHeight: '3rem',
+                        fontStyle: 'italic',
+                        fontFamily: '"Merriweather", serif'}}
             >
               {text}
               <Cursor />

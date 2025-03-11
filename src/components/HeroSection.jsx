@@ -15,15 +15,15 @@ import heroBg from '../assets/hero-bg.svg';
 import { useTypewriter, Cursor } from 'react-simple-typewriter';
 
 const HeroSection = () => {
-  // Typewriter effect for subheading text
-  const [ text ] = useTypewriter({
+  // Typewriter effect for subheading text using array destructuring
+  const [text] = useTypewriter({
     words: [
       "Empowering Decentralized Table Banking & Savings Groups With Blockchain Technology"
     ],
-    loop: 1,
-    typeSpeed: 10,
-    deleteSpeed: 5,
-    delaySpeed: 30,
+    loop: 0,
+    typeSpeed: 70,
+    deleteSpeed: 50,
+    delaySpeed: 2000,
   });
 
   return (
@@ -34,7 +34,7 @@ const HeroSection = () => {
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
         py: { xs: 5, md: 10 },
-        backgroundColor: 'rgba(0,0,0,0.5)', // dark overlay for contrast
+        backgroundColor: 'rgba(0,0,0,0.5)',
       }}
     >
       <Container maxWidth="lg">
@@ -58,7 +58,7 @@ const HeroSection = () => {
                 fontSize: { xs: '2.5rem', md: '4rem' },
               }}
             >
-              Welcome To Chama DApp
+              Welcome to Chama DApp
             </Typography>
             <Typography
               variant="h5"
@@ -73,26 +73,14 @@ const HeroSection = () => {
             <Grid container spacing={4} sx={{ textAlign: 'left', mt: 3, alignItems: 'stretch' }}>
               {/* First Row: Two Cards Side-by-Side */}
               <Grid item xs={12} md={6}>
-                <Card
-                  elevation={4}
-                  sx={{
-                    borderRadius: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                  }}
-                >
+                <Card elevation={4} sx={{ borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <CardHeader
                     title="What is a Chama?"
-                    sx={{
-                      textAlign: 'center',
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                    }}
+                    sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white' }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
                     <Typography variant="body1">
-                      A Chama is a community-based savings group that borrows its core principles from the traditional Rotating Savings and Credit Association (ROSCA) model. In a ROSCA, members regularly contribute a fixed sum to a common pool, and each member gets the opportunity to receive the entire pooled amount in turn. This model has long been used to empower unbanked and underbanked communities by providing a simple yet effective means of accessing a lump sum of money without relying on formal financial institutions.
+                      A Chama is a community-based savings group that borrows its core principles from the traditional <strong>ROSCA</strong> (Rotating Savings and Credit Association) model. In a ROSCA, members regularly contribute a fixed sum to a common pool, and each member gets the opportunity to receive the entire pooled amount in turn. This model has long been used to empower unbanked and underbanked communities by providing a simple yet effective means of accessing a lump sum of money without relying on formal financial institutions.
                       <br /><br />
                       In a Chama, members commit to contributing periodically, fostering mutual trust, collective responsibility, and financial discipline. This collaborative approach not only helps individuals save and access funds for emergencies or investments but also builds a resilient network of support within the community.
                     </Typography>
@@ -100,28 +88,23 @@ const HeroSection = () => {
                 </Card>
               </Grid>
               <Grid item xs={12} md={6}>
-                <Card
-                  elevation={4}
-                  sx={{
-                    borderRadius: 2,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    height: '100%',
-                  }}
-                >
+                <Card elevation={4} sx={{ borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <CardHeader
                     title="Why Chama DApp?"
-                    sx={{
-                      textAlign: 'center',
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                    }}
+                    sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white' }}
                   />
                   <CardContent sx={{ flexGrow: 1 }}>
-                    <Typography variant="body1">
-                      Traditional Chamas can sometimes encounter challenges related to transparency, trust, and accountability—such as mismanagement of funds or defaulting members. Chama DApp seeks to address these issues by bringing the entire process on-chain. By using smart contracts, Chama DApp enforces contribution rules (including penalties for default) and implements member-driven governance, ensuring that every participant has a voice and that funds are managed transparently.
+                    <Typography variant="body1" component="div">
+                      Traditional Chamas often face challenges such as:
+                      <ul style={{ margin: 0, paddingLeft: '1.5rem' }}>
+                        <li>💡 Lack of transparency in fund management</li>
+                        <li>💡 Trust issues when members default on contributions</li>
+                        <li>💡 Mismanagement or even misappropriation of funds by administrators</li>
+                      </ul>
+                      <br />
+                      Chama DApp addresses these issues by bringing the entire process on-chain. Using smart contracts, it enforces contribution rules (with penalty for defaults) and implements member-driven governance, ensuring that every participant has a voice and that funds are managed transparently.
                       <br /><br />
-                      This digital transformation of the ROSCA model not only preserves the core benefits of community-based savings but also introduces a new level of security, accountability, and efficiency to empower communities financially.
+                      This digital transformation of the ROSCA model not only preserves the core benefits of community-based savings but also introduces enhanced security, accountability, and efficiency to empower communities financially.
                     </Typography>
                   </CardContent>
                 </Card>
@@ -132,11 +115,7 @@ const HeroSection = () => {
                 <Card elevation={4} sx={{ borderRadius: 2 }}>
                   <CardHeader
                     title="How It Works"
-                    sx={{
-                      textAlign: 'center',
-                      backgroundColor: 'primary.main',
-                      color: 'white',
-                    }}
+                    sx={{ textAlign: 'center', backgroundColor: 'primary.main', color: 'white' }}
                   />
                   <CardContent>
                     <Typography variant="body1">

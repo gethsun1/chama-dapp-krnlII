@@ -58,7 +58,7 @@ const HeroSection = () => {
                 fontSize: { xs: '2.5rem', md: '4rem' },
               }}
             >
-              Welcome to Chama DApp
+              Welcome To Chama DApp
             </Typography>
             <Typography
               variant="h5"

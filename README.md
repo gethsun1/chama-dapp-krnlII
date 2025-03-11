@@ -2,7 +2,7 @@
 
   #          Chama Dapp
 
-[![Screenshot-from-2025-03-11-18-09-28.png](https://i.postimg.cc/1XpZdQX5/Screenshot-from-2025-03-11-18-09-28.png)](https://postimg.cc/2L8JqgnP)
+[![Chama-Dapp-Bg.png](https://i.postimg.cc/T3XgWqgz/Chama-Dapp-Bg.png)](https://postimg.cc/4mBmDc8P)
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)  
 [![Vite](https://img.shields.io/badge/Vite-4.0.0-blue)](https://vitejs.dev/)  
 [![Material UI](https://img.shields.io/badge/Material%20UI-v5-blue)](https://mui.com/)  

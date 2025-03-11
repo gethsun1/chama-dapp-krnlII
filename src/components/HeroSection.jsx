@@ -22,10 +22,10 @@ const HeroSection = () => {
     words: [
       "Empowering Decentralized Table Banking & Savings Groups With Blockchain Technology"
     ],
-    loop: 0,
-    typeSpeed: 70,
-    deleteSpeed: 50,
-    delaySpeed: 2000,
+    loop: 1,
+    typeSpeed: 10,
+    deleteSpeed: 10,
+    delaySpeed: 500,
   });
 
   return (

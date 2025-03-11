@@ -1,0 +1,16 @@
+<svg width="400" height="100" xmlns="http://www.w3.org/2000/svg">
+  <!-- Black background -->
+  <rect width="100%" height="100%" fill="black"/>
+  <!-- Calligraphic white text -->
+  <text
+    x="50%"
+    y="50%"
+    dominant-baseline="middle"
+    text-anchor="middle"
+    font-family="Brush Script MT, cursive"
+    font-size="48"
+    fill="white"
+    stroke="none">
+    Chama Dapp
+  </text>
+</svg>

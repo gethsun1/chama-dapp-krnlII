@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
-  Typography,
   Button,
   IconButton,
   Drawer,
@@ -18,7 +17,7 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import ConnectButton from "../ConnectButton";
 import { useAppKitAccount } from '@reown/appkit/react';
-
+import heroLogo from "../assets/hero-logo.svg";
 
 const NavigationBar = () => {
   const theme = useTheme();
@@ -40,9 +39,9 @@ const NavigationBar = () => {
   return (
     <AppBar position="static" sx={{ backgroundColor: "black" }}>
       <Toolbar>
-        <Typography variant="h6" sx={{ flexGrow: 1 }}>
-          Chama DApp
-        </Typography>
+        <Box sx={{ flexGrow: 1 }}>
+          <img src={heroLogo} alt="Chama DApp Logo" style={{ height: "40px" }} />
+        </Box>
         {isMobile ? (
           <>
             <IconButton
@@ -106,13 +105,12 @@ const NavigationBar = () => {
               key={index}
               component={Link}
               to={link.path}
-              sx={{ color: "white", textTransform: "none" }}
+              sx={{ color: "white", textTransform: "none", mx: 1 }}
             >
               {link.title}
             </Button>
           ))
         )}
-        {/* Only render the Appkit ConnectButton; no additional button or truncation */}
         <Box sx={{ ml: 2 }}>
           <ConnectButton />
         </Box>

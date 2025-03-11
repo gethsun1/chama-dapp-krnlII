@@ -1,45 +1,155 @@
 // src/components/HeroSection.jsx
 import React from 'react';
-import { Box, Container, Typography } from '@mui/material';
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  Paper,
+  Fade
+} from '@mui/material';
 import heroBg from '../assets/hero-bg.svg';
+import { useTypewriter, Cursor } from 'react-simple-typewriter';
 
 const HeroSection = () => {
+  // Typewriter effect for subheading text
+  const [ text ] = useTypewriter({
+    words: [
+      "Empowering Decentralized Table Banking & Savings Groups With Blockchain Technology"
+    ],
+    loop: 1,
+    typeSpeed: 10,
+    deleteSpeed: 5,
+    delaySpeed: 30,
+  });
+
   return (
     <Box
       sx={{
-        backgroundColor: 'white',
         backgroundImage: `url(${heroBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
-        py: { xs: 5, md: 10 }, 
+        py: { xs: 5, md: 10 },
+        backgroundColor: 'rgba(0,0,0,0.5)', // dark overlay for contrast
       }}
     >
-      <Container
-        maxWidth="md"
-        sx={{
-          textAlign: 'center',
-          backgroundColor: 'rgba(255, 255, 255, 0.8)',
-          p: { xs: 2, md: 4 }, 
-          borderRadius: 2,
-        }}
-      >
-        <Typography
-          variant="h3"
-          component="h1"
-          gutterBottom
-          sx={{ color: 'primary.main', fontSize: { xs: '2rem', md: '3rem' } }} // Responsive font size
-        >
-          Welcome to Chama DApp
-        </Typography>
-        <Typography
-          variant="h6"
-          component="p"
-          gutterBottom
-          sx={{ color: 'text.secondary', fontSize: { xs: '1rem', md: '1.25rem' } }}
-        >
-          Empowering decentralized savings groups with blockchain technology.
-        </Typography>
+      <Container maxWidth="lg">
+        <Fade in timeout={1500}>
+          <Paper
+            elevation={6}
+            sx={{
+              p: { xs: 3, md: 6 },
+              borderRadius: 2,
+              backgroundColor: 'rgba(255,255,255,0.9)',
+              textAlign: 'center',
+            }}
+          >
+            <Typography
+              variant="h3"
+              component="h1"
+              gutterBottom
+              sx={{
+                fontWeight: 900,
+                fontFamily: 'fantasy',
+                fontSize: { xs: '2.5rem', md: '4rem' },
+              }}
+            >
+              Welcome To Chama DApp
+            </Typography>
+            <Typography
+              variant="h5"
+              component="p"
+              gutterBottom
+              sx={{ color: 'primary.main', minHeight: '3rem' }}
+            >
+              {text}
+              <Cursor />
+            </Typography>
+
+            <Grid container spacing={4} sx={{ textAlign: 'left', mt: 3, alignItems: 'stretch' }}>
+              {/* First Row: Two Cards Side-by-Side */}
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={4}
+                  sx={{
+                    borderRadius: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  <CardHeader
+                    title="What is a Chama?"
+                    sx={{
+                      textAlign: 'center',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                    }}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="body1">
+                      A Chama is a community-based savings group that borrows its core principles from the traditional Rotating Savings and Credit Association (ROSCA) model. In a ROSCA, members regularly contribute a fixed sum to a common pool, and each member gets the opportunity to receive the entire pooled amount in turn. This model has long been used to empower unbanked and underbanked communities by providing a simple yet effective means of accessing a lump sum of money without relying on formal financial institutions.
+                      <br /><br />
+                      In a Chama, members commit to contributing periodically, fostering mutual trust, collective responsibility, and financial discipline. This collaborative approach not only helps individuals save and access funds for emergencies or investments but also builds a resilient network of support within the community.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+              <Grid item xs={12} md={6}>
+                <Card
+                  elevation={4}
+                  sx={{
+                    borderRadius: 2,
+                    display: 'flex',
+                    flexDirection: 'column',
+                    height: '100%',
+                  }}
+                >
+                  <CardHeader
+                    title="Why Chama DApp?"
+                    sx={{
+                      textAlign: 'center',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                    }}
+                  />
+                  <CardContent sx={{ flexGrow: 1 }}>
+                    <Typography variant="body1">
+                      Traditional Chamas can sometimes encounter challenges related to transparency, trust, and accountability—such as mismanagement of funds or defaulting members. Chama DApp seeks to address these issues by bringing the entire process on-chain. By using smart contracts, Chama DApp enforces contribution rules (including penalties for default) and implements member-driven governance, ensuring that every participant has a voice and that funds are managed transparently.
+                      <br /><br />
+                      This digital transformation of the ROSCA model not only preserves the core benefits of community-based savings but also introduces a new level of security, accountability, and efficiency to empower communities financially.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Second Row: Full-Width Card */}
+              <Grid item xs={12}>
+                <Card elevation={4} sx={{ borderRadius: 2 }}>
+                  <CardHeader
+                    title="How It Works"
+                    sx={{
+                      textAlign: 'center',
+                      backgroundColor: 'primary.main',
+                      color: 'white',
+                    }}
+                  />
+                  <CardContent>
+                    <Typography variant="body1">
+                      1. Connect your wallet using the AppKit Connect button.<br />
+                      2. Create a new Chama or join an existing one by specifying deposit, contribution, penalty, and maximum members.<br />
+                      3. Enjoy automated, transparent contributions and payouts with built-in governance mechanisms that give every member a voice.
+                    </Typography>
+                  </CardContent>
+                </Card>
+              </Grid>
+            </Grid>
+          </Paper>
+        </Fade>
       </Container>
     </Box>
   );

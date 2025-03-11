@@ -2,7 +2,7 @@
 
   #          Chama Dapp
 
-[![Chama Dapp Banner](https://i.postimg.cc/2y86kqFL/IMG-20250302-WA0000.jpg)](https://postimg.cc/0MFxZy49)
+[![Chama Dapp Banner](https://postimg.cc/2L8JqgnP)
 
 [![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)  
 [![Vite](https://img.shields.io/badge/Vite-4.0.0-blue)](https://vitejs.dev/)  

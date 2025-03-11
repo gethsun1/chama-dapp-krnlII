@@ -17,11 +17,14 @@ import {
 import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 import ConnectButton from "../ConnectButton";
+import { useAppKitAccount } from '@reown/appkit/react';
+
 
 const NavigationBar = () => {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const { isConnected, address } = useAppKitAccount();
 
   const toggleDrawer = (open) => () => {
     setDrawerOpen(open);

@@ -12,18 +12,23 @@ import {
   MenuItem,
   IconButton,
   Fade,
+  Snackbar,
+  Alert
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { Add, Remove } from '@mui/icons-material';
-import { useAccount, useChainId, useWalletClient } from 'wagmi';
-import { ethers } from 'ethers';
-import { parseUnits } from 'viem';
+import {
+  useAppKitAccount,
+  useAppKitNetwork,
+  useAppKitProvider,
+} from '@reown/appkit/react';
+import { Contract, BrowserProvider, parseUnits } from 'ethers';
 import ChamaFactoryABI from '../contracts/ChamaFactoryABI.json';
+import { useNavigate } from 'react-router-dom';
 
 const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
-// Expected chain id for Scroll Sepolia Testnet (adjust if needed)
 const EXPECTED_CHAIN_ID = 534351;
 
 const CreateChama = () => {
@@ -38,30 +43,33 @@ const CreateChama = () => {
   const [maxMembers, setMaxMembers] = useState(1);
   const [rules, setRules] = useState('');
   const [formVisible, setFormVisible] = useState(true);
+  
+  // Toast state
+  const [toastOpen, setToastOpen] = useState(false);
+  
+  // AppKit hooks for wallet connection and network info
+  const { isConnected, address } = useAppKitAccount();
+  const { chainId } = useAppKitNetwork();
+  const { walletProvider } = useAppKitProvider('eip155');
 
-  // Wallet and network hooks
-  const { address, isConnected } = useAccount();
-  const chainId = useChainId();
-  // We still use walletClient for any additional info if needed (not used for signer now)
-  const { data: walletClient } = useWalletClient();
+  // For navigation
+  const navigate = useNavigate();
 
-  // Debug logging for wallet status
   useEffect(() => {
     console.log("[DEBUG] Wallet Status:", {
       isConnected,
       chainId,
       expectedChain: EXPECTED_CHAIN_ID,
       address,
+      walletProvider,
     });
-  }, [isConnected, chainId, address]);
+  }, [isConnected, chainId, address, walletProvider]);
 
-  // Handlers for maximum members stepper
   const handleIncrementMaxMembers = () => setMaxMembers(prev => prev + 1);
   const handleDecrementMaxMembers = () => {
     if (maxMembers > 1) setMaxMembers(prev => prev - 1);
   };
 
-  // Helper function to map contribution cycle to duration in seconds
   const getCycleDuration = (cycle) => {
     const durations = {
       daily: 86400,
@@ -71,12 +79,10 @@ const CreateChama = () => {
     return durations[cycle.toLowerCase()] || 86400;
   };
 
-  // Handler for form submission using ethers.js for contract interaction
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
       console.log("[SUBMIT] Initiating creation...");
-
       if (!isConnected) {
         alert("Please connect your wallet.");
         return;
@@ -89,63 +95,62 @@ const CreateChama = () => {
         alert("Missing required fields");
         return;
       }
-
-      // Validate numeric values
-      const depositValue = Number(depositAmount);
-      const contributionValue = Number(contributionAmount);
+      const depositValue = parseFloat(depositAmount);
+      const contributionValue = parseFloat(contributionAmount);
       if (isNaN(depositValue)) throw new Error("Invalid deposit amount");
       if (isNaN(contributionValue)) throw new Error("Invalid contribution amount");
-
-      // Convert amounts from ETH to Wei using viem's parseUnits.
-      const depositInWei = parseUnits(depositValue.toFixed(18), 18);
-      const contributionInWei = parseUnits(contributionValue.toFixed(18), 18);
-
+      
+      // Convert amounts using ethers' parseUnits (returns bigint)
+      const depositInWei = parseUnits(depositAmount, 18);
+      const contributionInWei = parseUnits(contributionAmount, 18);
+      const cycleDuration = getCycleDuration(contributionCycle);
+      
       console.log("[VALUES] Converted:", {
         depositInWei: depositInWei.toString(),
         contributionInWei: contributionInWei.toString(),
         penalty: Math.round(penalty),
         maxMembers,
+        cycleDuration,
       });
-
-      // Get the signer using ethers BrowserProvider (ethers v6)
-      if (!window.ethereum) {
-        throw new Error("No window.ethereum object found");
+      
+      if (!walletProvider) {
+        throw new Error("No injected provider found via AppKit");
       }
-      const provider = new ethers.BrowserProvider(window.ethereum);
+      const provider = new BrowserProvider(walletProvider);
       const signer = await provider.getSigner();
       if (!signer) {
         throw new Error("No signer available");
       }
-
-      // Create an ethers Contract instance using the signer
-      const contract = new ethers.Contract(contractAddress, ChamaFactoryABI, signer);
-      const cycleDuration = getCycleDuration(contributionCycle);
-
-      // Call createChama on the contract
+      
+      const contract = new Contract(contractAddress, ChamaFactoryABI, signer);
       const tx = await contract.createChama(
         chamaName.trim(),
         description.trim(),
         depositInWei,
         contributionInWei,
-        Math.round(penalty),
-        maxMembers,
-        cycleDuration
+        BigInt(Math.round(penalty)),
+        BigInt(maxMembers),
+        BigInt(cycleDuration)
       );
       console.log("[TX SENT] Hash:", tx.hash);
       await tx.wait();
       console.log("[TX CONFIRMED]");
+      
+      // Show toast and redirect after a short delay
+      setToastOpen(true);
+      setTimeout(() => {
+        navigate("/join-chama");
+      }, 2000);
     } catch (error) {
       console.error("[ERROR]", error);
-      alert(`Submission failed: ${error.message}`);
+      alert(`Submission failed: ${error.shortMessage || error.message}`);
     }
   };
 
-  // Handler for cancellation
   const handleCancel = () => {
     console.log('Creation cancelled');
   };
 
-  // Determine if form can be submitted
   const isFormEnabled = isConnected && chainId === EXPECTED_CHAIN_ID;
 
   return (
@@ -320,6 +325,16 @@ const CreateChama = () => {
           </Box>
         </Paper>
       </Fade>
+      <Snackbar
+        open={toastOpen}
+        autoHideDuration={3000}
+        onClose={() => setToastOpen(false)}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
+        <Alert onClose={() => setToastOpen(false)} severity="success" sx={{ width: '100%' }}>
+          Chama has been created successfully!
+        </Alert>
+      </Snackbar>
     </Container>
   );
 };

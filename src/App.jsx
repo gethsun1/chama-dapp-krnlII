@@ -1,17 +1,18 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { Box } from "@mui/material";
-import { AppKitProvider } from "./config";
 import NavigationBar from "./components/NavigationBar";
 import LandingPage from "./components/LandingPage";
 import CreateChama from "./pages/CreateChama";
 import JoinChama from "./pages/JoinChama";
 import Dashboard from "./pages/Dashboard";
 import Footer from "./components/Footer";
+import AppKitConfig from "./config"; // Import your config file
 
 function App() {
   return (
-    <AppKitProvider>
+    <>
+      <AppKitConfig /> {/* Initialize AppKit at root level */}
       <Router>
         <Box
           sx={{
@@ -20,10 +21,7 @@ function App() {
             minHeight: "100vh",
           }}
         >
-          {/* Navigation Bar */}
           <NavigationBar />
-
-          {/* Main Content */}
           <Box sx={{ flex: 1 }}>
             <Routes>
               <Route path="/" element={<LandingPage />} />
@@ -32,12 +30,10 @@ function App() {
               <Route path="/dashboard" element={<Dashboard />} />
             </Routes>
           </Box>
-
-          {/* Footer */}
           <Footer />
         </Box>
       </Router>
-    </AppKitProvider>
+    </>
   );
 }
 

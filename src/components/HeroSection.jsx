@@ -76,7 +76,7 @@ const HeroSection = () => {
             </Typography>
 
             <Grid container spacing={4} sx={{ textAlign: 'left', mt: 3, alignItems: 'stretch' }}>
-              {/* First Row: Two Cards Side-by-Side */}
+              
               <Grid item xs={12} md={6}>
                 <Card elevation={4} sx={{ borderRadius: 2, display: 'flex', flexDirection: 'column', height: '100%' }}>
                   <CardHeader
@@ -115,7 +115,7 @@ const HeroSection = () => {
                 </Card>
               </Grid>
 
-              {/* Second Row: Full-Width Card */}
+             
               <Grid item xs={12}>
                 <Card elevation={4} sx={{ borderRadius: 2 }}>
                   <CardHeader
@@ -124,7 +124,7 @@ const HeroSection = () => {
                   />
                   <CardContent>
                     <Typography variant="body1">
-                      1. Connect your wallet using the AppKit Connect button.<br />
+                      1. Connect your wallet using the  Connect button.<br />
                       2. Create a new Chama or join an existing one by specifying deposit, contribution, penalty, and maximum members.<br />
                       3. Enjoy automated, transparent contributions and payouts with built-in governance mechanisms that give every member a voice.
                     </Typography>

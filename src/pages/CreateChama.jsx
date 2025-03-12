@@ -13,7 +13,7 @@ import {
   IconButton,
   Fade,
   Snackbar,
-  Alert
+  Alert,
 } from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
@@ -51,10 +51,10 @@ const CreateChama = () => {
   const { isConnected, address } = useAppKitAccount();
   const { chainId } = useAppKitNetwork();
   const { walletProvider } = useAppKitProvider('eip155');
-
+  
   // For navigation
   const navigate = useNavigate();
-
+  
   useEffect(() => {
     console.log("[DEBUG] Wallet Status:", {
       isConnected,
@@ -64,12 +64,12 @@ const CreateChama = () => {
       walletProvider,
     });
   }, [isConnected, chainId, address, walletProvider]);
-
+  
   const handleIncrementMaxMembers = () => setMaxMembers(prev => prev + 1);
   const handleDecrementMaxMembers = () => {
     if (maxMembers > 1) setMaxMembers(prev => prev - 1);
   };
-
+  
   const getCycleDuration = (cycle) => {
     const durations = {
       daily: 86400,
@@ -79,6 +79,16 @@ const CreateChama = () => {
     return durations[cycle.toLowerCase()] || 86400;
   };
 
+  // Helper to get human-readable cycle string
+  const getHumanReadableCycle = (cycle) => {
+    const mapping = {
+      daily: "Daily",
+      weekly: "Weekly",
+      monthly: "Monthly",
+    };
+    return mapping[cycle.toLowerCase()] || `${cycle} seconds`;
+  };
+  
   const handleSubmit = async (event) => {
     event.preventDefault();
     try {
@@ -103,14 +113,14 @@ const CreateChama = () => {
       // Convert amounts using ethers' parseUnits (returns bigint)
       const depositInWei = parseUnits(depositAmount, 18);
       const contributionInWei = parseUnits(contributionAmount, 18);
-      const cycleDuration = getCycleDuration(contributionCycle);
+      const cycleDurationNumeric = getCycleDuration(contributionCycle);
       
       console.log("[VALUES] Converted:", {
         depositInWei: depositInWei.toString(),
         contributionInWei: contributionInWei.toString(),
         penalty: Math.round(penalty),
         maxMembers,
-        cycleDuration,
+        cycleDuration: cycleDurationNumeric,
       });
       
       if (!walletProvider) {
@@ -130,11 +140,34 @@ const CreateChama = () => {
         contributionInWei,
         BigInt(Math.round(penalty)),
         BigInt(maxMembers),
-        BigInt(cycleDuration)
+        BigInt(cycleDurationNumeric)
       );
       console.log("[TX SENT] Hash:", tx.hash);
       await tx.wait();
       console.log("[TX CONFIRMED]");
+      
+      // Prepare notification payload
+      const notifyPayload = {
+        chamaName: chamaName.trim(),
+        description: description.trim(),
+        depositAmount, // as entered by user (in ETH)
+        contributionAmount, // as entered by user (in ETH)
+        cycleDuration: getHumanReadableCycle(contributionCycle),
+        penalty: Math.round(penalty),
+      };
+      
+      // Trigger email notifications via notify endpoint
+      try {
+        const notifyResponse = await fetch('http://localhost:3000/api/notify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(notifyPayload),
+        });
+        const notifyData = await notifyResponse.json();
+        console.log("[NOTIFY] Response:", notifyData);
+      } catch (notifyError) {
+        console.error("[NOTIFY ERROR]", notifyError);
+      }
       
       // Show toast and redirect after a short delay
       setToastOpen(true);
@@ -146,13 +179,13 @@ const CreateChama = () => {
       alert(`Submission failed: ${error.shortMessage || error.message}`);
     }
   };
-
+  
   const handleCancel = () => {
     console.log('Creation cancelled');
   };
-
+  
   const isFormEnabled = isConnected && chainId === EXPECTED_CHAIN_ID;
-
+  
   return (
     <Container maxWidth="sm" sx={{ mt: 4, mb: 4 }}>
       <Fade in={formVisible} timeout={1000}>

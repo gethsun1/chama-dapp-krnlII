@@ -4,6 +4,7 @@ import HeroSection from './HeroSection';
 import TestimonialsSection from './TestimonialsSection';
 import BenefitsSection from './BenefitsSection';
 import StatsSection from './StatsSection';
+import EmailSubscription from './EmailSubscription';
 
 
 const LandingPage = () => {
@@ -13,6 +14,7 @@ const LandingPage = () => {
       <TestimonialsSection />
       <BenefitsSection />
       <StatsSection />
+      <EmailSubscription/>
     </div>
   );
 };

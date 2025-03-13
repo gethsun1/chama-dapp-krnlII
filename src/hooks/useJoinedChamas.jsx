@@ -1,6 +1,6 @@
 // src/hooks/useJoinedChamas.js
 import { useState, useEffect } from "react";
-import { BrowserProvider, Contract, formatUnits } from "ethers";
+import { BrowserProvider, Contract, formatUnits, getAddress } from "ethers";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import ChamaFactoryABI from "../contracts/ChamaFactoryABI.json";
 
@@ -18,19 +18,26 @@ const useJoinedChamas = () => {
       try {
         const provider = new BrowserProvider(walletProvider);
         const contract = new Contract(contractAddress, ChamaFactoryABI, provider);
-        const chamaCount = await contract.chamaCount();
+        const chamaCountBN = await contract.chamaCount();
+        const chamaCount = Number(chamaCountBN);
+        console.log("[DEBUG] Total Chamas:", chamaCount);
+        const normalizedAddress = getAddress(address);
         const joined = [];
+
         // Iterate over all chamas (assuming IDs start at 1)
-        for (let i = 1; i <= Number(chamaCount); i++) {
-          const memberStatus = await contract.isMember(i, address);
+        for (let i = 1; i <= chamaCount; i++) {
+          const memberStatus = await contract.isMember(i, normalizedAddress);
+          console.log(`[DEBUG] Chama ${i} membership for ${normalizedAddress}:`, memberStatus);
           if (memberStatus) {
             const chamaData = await contract.chamas(i);
+            // Retrieve deposit held by the user in this Chama
+            const depositHeldBN = await contract.memberDeposit(i, normalizedAddress);
+            const depositHeld = formatUnits(depositHeldBN, 18);
             joined.push({
               id: Number(chamaData.id),
               creator: chamaData.creator,
               name: chamaData.name,
               description: chamaData.description,
-              // Convert wei to ETH using formatUnits
               depositAmount: formatUnits(chamaData.depositAmount, 18),
               contributionAmount: formatUnits(chamaData.contributionAmount, 18),
               penalty: chamaData.penalty.toString(),
@@ -42,6 +49,7 @@ const useJoinedChamas = () => {
               nextCycleStart: chamaData.nextCycleStart.toString(),
               isActive: chamaData.isActive,
               members: chamaData.members,
+              depositHeld, // User's held deposit in this Chama
             });
           }
         }

@@ -29,20 +29,20 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { WhatsApp, Telegram, Twitter, Email, ContentCopy } from "@mui/icons-material";
+import { ContentCopy } from "@mui/icons-material";
 import ChamaCard from "./ChamaCard";
-import { useAppKitAccount } from "@reown/appkit/react";
+import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
 import useJoinedChamas from "../hooks/useJoinedChamas";
+import { BrowserProvider, formatUnits } from "ethers";
 
 const Dashboard = () => {
   const { isConnected, address } = useAppKitAccount();
+  const { walletProvider } = useAppKitProvider("eip155");
   const [openSnackbar, setOpenSnackbar] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
-  
- 
+  const [walletBalance, setWalletBalance] = useState("Loading...");
   const joinedChamas = useJoinedChamas();
 
- 
+  // Dummy analytics data (for demo purposes)
   const contributionData = [
     { name: "Jan", amount: 2.5 },
     { name: "Feb", amount: 3.0 },
@@ -58,6 +58,30 @@ const Dashboard = () => {
     navigator.clipboard.writeText(address);
     setOpenSnackbar(true);
   };
+
+  // Fetch wallet ETH balance
+  useEffect(() => {
+    const fetchBalance = async () => {
+      if (!isConnected || !walletProvider || !address) return;
+      try {
+        const provider = new BrowserProvider(walletProvider);
+        const balanceBN = await provider.getBalance(address);
+        const balance = formatUnits(balanceBN, 18);
+        setWalletBalance(balance);
+      } catch (error) {
+        console.error("Error fetching wallet balance:", error);
+        setWalletBalance("Error");
+      }
+    };
+
+    fetchBalance();
+  }, [isConnected, walletProvider, address]);
+
+  // Calculate total held deposit across joined chamas
+  const totalHeldDeposit = joinedChamas.reduce((acc, chama) => {
+    const deposit = parseFloat(chama.depositHeld || "0");
+    return acc + deposit;
+  }, 0).toFixed(4); // Adjust precision as needed
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
@@ -91,16 +115,13 @@ const Dashboard = () => {
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Box>
-              {/* Dummy user data for demo - replace with real analytics when available */}
               <Typography variant="body2">
-                Total Balance: 5.2 ETH
+                ETH Balance: {walletBalance} ETH
               </Typography>
               <Typography variant="body2">
-                Deposit Held: 1.0 ETH
+                Total Held Deposit: {totalHeldDeposit} ETH
               </Typography>
-              <Typography variant="body2">
-                Next Contribution: 0.2 ETH due in 5 days
-              </Typography>
+              {/* Next Contribution could be added here if available */}
             </CardContent>
           </Card>
         </Grid>

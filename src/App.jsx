@@ -7,7 +7,8 @@ import CreateChama from "./pages/CreateChama";
 import JoinChama from "./pages/JoinChama";
 import Dashboard from "./pages/Dashboard";
 import Footer from "./components/Footer";
-import AppKitConfig from "./config"; // Import your config file
+import AppKitConfig from "./config"; // Initialize AppKit at root level
+import ChatPlaceholder from "./components/ChatPlaceholder"; // Import the ChatPlaceholder
 
 function App() {
   return (
@@ -33,6 +34,8 @@ function App() {
           <Footer />
         </Box>
       </Router>
+      {/* ChatPlaceholder is rendered globally */}
+      <ChatPlaceholder />
     </>
   );
 }

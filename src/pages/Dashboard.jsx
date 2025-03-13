@@ -1,5 +1,5 @@
 // src/pages/Dashboard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Container,
   Grid,
@@ -29,61 +29,33 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import {
-  WhatsApp,
-  Telegram,
-  Twitter,
-  Email,
-  ContentCopy,
-} from "@mui/icons-material";
+import { WhatsApp, Telegram, Twitter, Email, ContentCopy } from "@mui/icons-material";
 import ChamaCard from "./ChamaCard";
+import { useAppKitAccount } from "@reown/appkit/react";
+import useJoinedChamas from "../hooks/useJoinedChamas";
 
 const Dashboard = () => {
+  const { isConnected, address } = useAppKitAccount();
   const [openSnackbar, setOpenSnackbar] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  
+ 
+  const joinedChamas = useJoinedChamas();
 
-  const user = {
-    name: "Quantum Quasar",
-    wallet: "0x1234...abcd",
-    totalBalance: "5.2 ETH",
-    depositHeld: "1.0 ETH",
-    nextContribution: "0.2 ETH due in 5 days",
-  };
-
-  const joinedChamas = [
-    {
-      name: "Tech Investors",
-      cycle: "Monthly",
-      contribution: "0.5 ETH",
-      penalty: "5%",
-      nextDue: "10 days",
-      total: "2.5 ETH",
-    },
-    {
-      name: "Crypto Savers",
-      cycle: "Weekly",
-      contribution: "0.2 ETH",
-      penalty: "3%",
-      nextDue: "3 days",
-      total: "1.8 ETH",
-    },
-  ];
-
+ 
   const contributionData = [
     { name: "Jan", amount: 2.5 },
     { name: "Feb", amount: 3.0 },
     { name: "Mar", amount: 3.5 },
   ];
-
   const pieData = [
     { name: "Held Deposit", value: 1 },
     { name: "Contributions", value: 4.2 },
   ];
   const COLORS = ["#0088FE", "#00C49F"];
 
-  const handleShare = () => setOpenDialog(true);
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(user.wallet);
+    navigator.clipboard.writeText(address);
     setOpenSnackbar(true);
   };
 
@@ -102,14 +74,14 @@ const Dashboard = () => {
           >
             <CardContent>
               <Avatar sx={{ width: 56, height: 56, mb: 2, bgcolor: "primary.main" }}>
-                {user.name.charAt(0)}
+                {isConnected && address ? address.charAt(2).toUpperCase() : "U"}
               </Avatar>
               <Typography variant="h6" sx={{ fontWeight: "bold" }}>
-                {user.name}
+                {isConnected && address ? "On-Chain User" : "Loading..."}
               </Typography>
               <Box display="flex" alignItems="center" sx={{ mt: 1, mb: 1 }}>
                 <Typography variant="body2" color="text.secondary">
-                  Wallet: {user.wallet}
+                  Wallet: {isConnected ? address : "Not connected"}
                 </Typography>
                 <IconButton
                   size="small"
@@ -119,14 +91,15 @@ const Dashboard = () => {
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Box>
+              {/* Dummy user data for demo - replace with real analytics when available */}
               <Typography variant="body2">
-                Total Balance: {user.totalBalance}
+                Total Balance: 5.2 ETH
               </Typography>
               <Typography variant="body2">
-                Deposit Held: {user.depositHeld}
+                Deposit Held: 1.0 ETH
               </Typography>
               <Typography variant="body2">
-                Next Contribution: {user.nextContribution}
+                Next Contribution: 0.2 ETH due in 5 days
               </Typography>
             </CardContent>
           </Card>
@@ -136,9 +109,13 @@ const Dashboard = () => {
         <Grid item xs={12} md={8}>
           <Fade in timeout={1000}>
             <Box>
-              {joinedChamas.map((chama, index) => (
-                <ChamaCard key={index} chama={chama} />
-              ))}
+              {joinedChamas && joinedChamas.length > 0 ? (
+                joinedChamas.map((chama) => (
+                  <ChamaCard key={chama.id} chama={chama} />
+                ))
+              ) : (
+                <Typography variant="body2">You haven't joined any Chamas yet.</Typography>
+              )}
             </Box>
           </Fade>
         </Grid>
@@ -187,7 +164,7 @@ const Dashboard = () => {
         <Button
           variant="contained"
           color="secondary"
-          onClick={handleShare}
+          onClick={() => {}}
           sx={{
             transition: "transform 0.3s",
             "&:hover": { transform: "scale(1.02)" },
@@ -196,47 +173,6 @@ const Dashboard = () => {
           Invite Members
         </Button>
       </Box>
-
-      {/* Invite Dialog */}
-      <Dialog open={openDialog} onClose={() => setOpenDialog(false)} fullWidth maxWidth="sm">
-        <Fade in={openDialog} timeout={500}>
-          <Box>
-            <DialogTitle sx={{ fontWeight: "bold" }}>Invite to Chama</DialogTitle>
-            <DialogContent dividers>
-              <Typography variant="body1">
-                Share this link to invite members: <strong>https://chamaapp.io/invite</strong>
-              </Typography>
-              <Grid container spacing={2} sx={{ mt: 2 }}>
-                <Grid item>
-                  <IconButton color="primary">
-                    <WhatsApp />
-                  </IconButton>
-                </Grid>
-                <Grid item>
-                  <IconButton color="secondary">
-                    <Telegram />
-                  </IconButton>
-                </Grid>
-                <Grid item>
-                  <IconButton color="primary">
-                    <Twitter />
-                  </IconButton>
-                </Grid>
-                <Grid item>
-                  <IconButton color="primary">
-                    <Email />
-                  </IconButton>
-                </Grid>
-              </Grid>
-            </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-              <Button onClick={() => setOpenDialog(false)} color="secondary">
-                Close
-              </Button>
-            </DialogActions>
-          </Box>
-        </Fade>
-      </Dialog>
 
       {/* Notifications */}
       <Snackbar

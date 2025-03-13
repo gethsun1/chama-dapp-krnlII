@@ -2,11 +2,12 @@
 import React, { useState, useEffect } from "react";
 import { 
   Container, Grid, Card, CardContent, Typography, Button, 
-  Box, Dialog, DialogTitle, DialogContent,CardActions, DialogActions, Fade 
+  Box, Dialog, DialogTitle, DialogContent, CardActions, DialogActions, Fade 
 } from "@mui/material";
-import { MonetizationOn,Groups, CalendarToday } from "@mui/icons-material";
+import { MonetizationOn, Groups, CalendarToday } from "@mui/icons-material";
 import { Contract, BrowserProvider, formatUnits, parseUnits } from "ethers";
 import { useAppKitProvider } from '@reown/appkit/react';
+import { useNavigate } from "react-router-dom";
 import ChamaFactoryABI from "../contracts/ChamaFactoryABI.json";
 
 const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
@@ -20,7 +21,6 @@ const safeConvert = (val) => {
   return val;
 };
 
-// Format duration remains the same
 const formatCycleDuration = (duration) => {
   const d = Number(duration);
   if (d === 86400) return "Daily";
@@ -29,7 +29,6 @@ const formatCycleDuration = (duration) => {
   return `${d}`;
 };
 
-// Simplified conversion using Ethers
 const convertWeiToEth = (weiValue) => {
   try {
     return formatUnits(weiValue, "ether");
@@ -39,7 +38,6 @@ const convertWeiToEth = (weiValue) => {
   }
 };
 
-// Formatter now handles Ethers BigNumbers
 const formatChama = (chamaArray) => ({
   id: parseInt(safeConvert(chamaArray[0])),
   creator: safeConvert(chamaArray[1]),
@@ -65,6 +63,7 @@ const JoinChama = () => {
   const [joinLoading, setJoinLoading] = useState(false);
   
   const { walletProvider } = useAppKitProvider('eip155');
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchChamas = async () => {
@@ -113,12 +112,15 @@ const JoinChama = () => {
         signer
       );
 
-      // Use Ethers parseUnits instead of Viem
+      // Convert depositAmount back to wei
       const value = parseUnits(selectedChama.depositAmount, "ether");
       
       const tx = await factoryContract.joinChama(selectedChama.id, { value });
       await tx.wait();
       handleClose();
+      
+      // Redirect to Dashboard after successful join
+      navigate("/dashboard");
     } catch (error) {
       console.error("Join error:", error);
     } finally {
@@ -126,7 +128,6 @@ const JoinChama = () => {
     }
   };
 
-  // Rest of the component remains the same
   const handleOpen = (chama) => {
     setSelectedChama(chama);
     setOpen(true);
@@ -147,51 +148,69 @@ const JoinChama = () => {
       <Grid container spacing={4}>
         {chamas.map((chama, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card sx={{ p: 2, borderRadius: 2, transition: "transform 0.3s, box-shadow 0.3s",
-                        "&:hover": { transform: "translateY(-5px)", boxShadow: 8 } }}>
+            <Card
+              sx={{
+                p: 2,
+                borderRadius: 2,
+                transition: "transform 0.3s, box-shadow 0.3s",
+                "&:hover": {
+                  transform: "translateY(-5px)",
+                  boxShadow: 8,
+                },
+              }}
+            >
               <CardContent>
                 <Typography variant="h6" sx={{ fontWeight: "medium" }}>
                   {chama.name || "No Name"}
                 </Typography>
-                <Typography variant="body2" color="text.secondary" gutterBottom sx={{ mt: 1, mb: 2 }}>
+                <Typography
+                  variant="body2"
+                  color="text.secondary"
+                  gutterBottom
+                  sx={{ mt: 1, mb: 2 }}
+                >
                   {chama.description || "No Description"}
                 </Typography>
-               {/* Inside the CardContent component */}
-<Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
-  <CalendarToday fontSize="small" color="action" />
-  <Typography variant="body2">
-    Cycle: {formatCycleDuration(chama.cycleDuration)}
-  </Typography>
-</Box>
-<Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
-  <MonetizationOn fontSize="small" color="action" />
-  <Typography variant="body2">
-    Deposit: {chama.depositAmount} ETH
-  </Typography>
-</Box>
-<Box sx={{ mb: 1 }}>
-  <Typography variant="body2">
-    Contribution: {chama.contributionAmount} ETH
-  </Typography>
-</Box>
-<Box sx={{ mb: 1 }}>
-  <Typography variant="body2">
-    Penalty: {chama.penalty}%
-  </Typography>
-</Box>
-<Box sx={{ mb: 1 }}>
-  <Typography variant="body2">
-    Max Members: {chama.maxMembers}
-  </Typography>
-</Box>
-<Box>
-  <Typography variant="body2">
-    Members Joined: {chama.membersCount}
-  </Typography>
-</Box>
+                <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
+                  <CalendarToday fontSize="small" color="action" />
+                  <Typography variant="body2">
+                    Cycle: {formatCycleDuration(chama.cycleDuration)}
+                  </Typography>
+                </Box>
+                <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
+                  <MonetizationOn fontSize="small" color="action" />
+                  <Typography variant="body2">
+                    Deposit: {chama.depositAmount} ETH
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Contribution: {chama.contributionAmount} ETH
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Penalty: {chama.penalty}%
+                  </Typography>
+                </Box>
+                <Box sx={{ mb: 1 }}>
+                  <Typography variant="body2">
+                    Max Members: {chama.maxMembers}
+                  </Typography>
+                </Box>
+                <Box>
+                  <Typography variant="body2">
+                    Members Joined: {chama.membersCount}
+                  </Typography>
+                </Box>
               </CardContent>
               <CardActions sx={{ px: 2, pb: 2 }}>
-                <Button variant="contained" color="primary" fullWidth onClick={() => handleOpen(chama)}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  fullWidth
+                  onClick={() => handleOpen(chama)}
+                >
                   Join
                 </Button>
               </CardActions>
@@ -207,58 +226,57 @@ const JoinChama = () => {
               {selectedChama?.name || "No Name"}
             </DialogTitle>
             <DialogContent dividers>
-             {/* Inside the DialogContent component */}
-<Typography variant="body1" gutterBottom>
-  {selectedChama?.description || "No Description"}
-</Typography>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Cycle Duration:
-  </Typography>
-  <Typography variant="body2">
-    {formatCycleDuration(selectedChama?.cycleDuration)}
-  </Typography>
-</Box>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Deposit Amount:
-  </Typography>
-  <Typography variant="body2">
-    {selectedChama?.depositAmount} ETH
-  </Typography>
-</Box>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Contribution Amount:
-  </Typography>
-  <Typography variant="body2">
-    {selectedChama?.contributionAmount} ETH
-  </Typography>
-</Box>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Penalty:
-  </Typography>
-  <Typography variant="body2">
-    {selectedChama?.penalty}%
-  </Typography>
-</Box>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Maximum Members:
-  </Typography>
-  <Typography variant="body2">
-    {selectedChama?.maxMembers}
-  </Typography>
-</Box>
-<Box sx={{ mt: 2 }}>
-  <Typography variant="subtitle2" color="text.secondary">
-    Members Joined:
-  </Typography>
-  <Typography variant="body2">
-    {selectedChama?.membersCount}
-  </Typography>
-</Box>
+              <Typography variant="body1" gutterBottom>
+                {selectedChama?.description || "No Description"}
+              </Typography>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Cycle Duration:
+                </Typography>
+                <Typography variant="body2">
+                  {formatCycleDuration(selectedChama?.cycleDuration)}
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Deposit Amount:
+                </Typography>
+                <Typography variant="body2">
+                  {selectedChama?.depositAmount} ETH
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Contribution Amount:
+                </Typography>
+                <Typography variant="body2">
+                  {selectedChama?.contributionAmount} ETH
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Penalty:
+                </Typography>
+                <Typography variant="body2">
+                  {selectedChama?.penalty}%
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Maximum Members:
+                </Typography>
+                <Typography variant="body2">
+                  {selectedChama?.maxMembers}
+                </Typography>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <Typography variant="subtitle2" color="text.secondary">
+                  Members Joined:
+                </Typography>
+                <Typography variant="body2">
+                  {selectedChama?.membersCount}
+                </Typography>
+              </Box>
             </DialogContent>
             <DialogActions sx={{ px: 3, pb: 2 }}>
               <Button onClick={handleClose} color="secondary">

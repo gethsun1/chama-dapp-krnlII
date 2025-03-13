@@ -56,7 +56,7 @@ const HeroSection = () => {
               gutterBottom
               sx={{
                 fontWeight: 900,
-                fontFamily: 'DM Serif Text',
+                fontFamily: 'Zen Tokyo Zoo',
                 fontSize: { xs: '2.5rem', md: '4rem' },
               }}
             >

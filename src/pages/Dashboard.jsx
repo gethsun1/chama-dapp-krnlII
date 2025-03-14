@@ -10,10 +10,6 @@ import {
   Avatar,
   Snackbar,
   Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
   IconButton,
   Box,
   Fade,
@@ -42,24 +38,27 @@ const Dashboard = () => {
   const [walletBalance, setWalletBalance] = useState("Loading...");
   const joinedChamas = useJoinedChamas();
 
-  // Dummy analytics data (for demo purposes)
+  // Contribution history sample data (for demo purposes)
   const contributionData = [
     { name: "Jan", amount: 2.5 },
     { name: "Feb", amount: 3.0 },
     { name: "Mar", amount: 3.5 },
   ];
+
+  // Pie chart data for funds allocation
   const pieData = [
     { name: "Held Deposit", value: 1 },
     { name: "Contributions", value: 4.2 },
   ];
   const COLORS = ["#0088FE", "#00C49F"];
 
+  // Copies the wallet address to clipboard
   const copyToClipboard = () => {
     navigator.clipboard.writeText(address);
     setOpenSnackbar(true);
   };
 
-  // Fetch wallet ETH balance
+  // Fetch the ETH balance of the connected wallet
   useEffect(() => {
     const fetchBalance = async () => {
       if (!isConnected || !walletProvider || !address) return;
@@ -77,25 +76,18 @@ const Dashboard = () => {
     fetchBalance();
   }, [isConnected, walletProvider, address]);
 
-  // Calculate total held deposit across joined chamas
+  // Calculate total held deposit from joined Chamas
   const totalHeldDeposit = joinedChamas.reduce((acc, chama) => {
     const deposit = parseFloat(chama.depositHeld || "0");
     return acc + deposit;
-  }, 0).toFixed(4); // Adjust precision as needed
+  }, 0).toFixed(4);
 
   return (
     <Container sx={{ mt: 4, mb: 4 }}>
       <Grid container spacing={4}>
-        {/* User Overview */}
+        {/* User Overview Card */}
         <Grid item xs={12} md={4}>
-          <Card
-            sx={{
-              borderRadius: 3,
-              background:
-                "linear-gradient(135deg, rgba(0,123,255,0.1), rgba(0,123,255,0.05))",
-              p: 2,
-            }}
-          >
+          <Card sx={{ borderRadius: 3, background: "linear-gradient(135deg, rgba(0,123,255,0.1), rgba(0,123,255,0.05))", p: 2 }}>
             <CardContent>
               <Avatar sx={{ width: 56, height: 56, mb: 2, bgcolor: "primary.main" }}>
                 {isConnected && address ? address.charAt(2).toUpperCase() : "U"}
@@ -115,18 +107,13 @@ const Dashboard = () => {
                   <ContentCopy fontSize="small" />
                 </IconButton>
               </Box>
-              <Typography variant="body2">
-                ETH Balance: {walletBalance} ETH
-              </Typography>
-              <Typography variant="body2">
-                Total Held Deposit: {totalHeldDeposit} ETH
-              </Typography>
-              {/* Next Contribution could be added here if available */}
+              <Typography variant="body2">ETH Balance: {walletBalance} ETH</Typography>
+              <Typography variant="body2">Total Held Deposit: {totalHeldDeposit} ETH</Typography>
             </CardContent>
           </Card>
         </Grid>
 
-        {/* Active Chamas */}
+        {/* Active Chamas Section */}
         <Grid item xs={12} md={8}>
           <Fade in timeout={1000}>
             <Box>
@@ -141,13 +128,11 @@ const Dashboard = () => {
           </Fade>
         </Grid>
 
-        {/* Analytics */}
+        {/* Analytics Section */}
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 2, p: 2 }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Contribution History
-              </Typography>
+              <Typography variant="h6" sx={{ mb: 2 }}>Contribution History</Typography>
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={contributionData}>
                   <XAxis dataKey="name" stroke="#8884d8" />
@@ -163,9 +148,7 @@ const Dashboard = () => {
         <Grid item xs={12} md={6}>
           <Card sx={{ borderRadius: 2, p: 2 }}>
             <CardContent>
-              <Typography variant="h6" sx={{ mb: 2 }}>
-                Funds Allocation
-              </Typography>
+              <Typography variant="h6" sx={{ mb: 2 }}>Funds Allocation</Typography>
               <ResponsiveContainer width="100%" height={250}>
                 <PieChart>
                   <Pie data={pieData} dataKey="value" outerRadius={80} label>
@@ -179,33 +162,6 @@ const Dashboard = () => {
           </Card>
         </Grid>
       </Grid>
-
-      {/* Invite Members */}
-      <Box display="flex" justifyContent="center" sx={{ mt: 4 }}>
-        <Button
-          variant="contained"
-          color="secondary"
-          onClick={() => {}}
-          sx={{
-            transition: "transform 0.3s",
-            "&:hover": { transform: "scale(1.02)" },
-          }}
-        >
-          Invite Members
-        </Button>
-      </Box>
-
-      {/* Notifications */}
-      <Snackbar
-        open={openSnackbar}
-        autoHideDuration={6000}
-        onClose={() => setOpenSnackbar(false)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-      >
-        <Alert severity="success" sx={{ width: "100%" }}>
-          Wallet address copied to clipboard!
-        </Alert>
-      </Snackbar>
     </Container>
   );
 };

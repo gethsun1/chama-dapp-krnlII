@@ -19,12 +19,15 @@ import {
 import { ContentCopy, WhatsApp, Telegram, Twitter, Email } from "@mui/icons-material";
 
 const ChamaCard = ({ chama }) => {
+  // State to control the share modal visibility
   const [shareModalOpen, setShareModalOpen] = useState(false);
+  // State to manage the snackbar for copied link confirmation
   const [copySnackbarOpen, setCopySnackbarOpen] = useState(false);
 
-  // Construct the share URL using the Chama ID (adjust base URL as needed)
+  // Generate a shareable URL for the specific Chama
   const shareUrl = `https://chama-dapp.vercel.app/chama/${chama.id}`;
 
+  // Function to copy the share URL to clipboard
   const handleCopyUrl = async () => {
     try {
       await navigator.clipboard.writeText(shareUrl);
@@ -34,8 +37,8 @@ const ChamaCard = ({ chama }) => {
     }
   };
 
+  // Placeholder function for contributing, can be expanded later
   const handleContribute = () => {
-    // Placeholder logic for contribution to be replaced with actual functionality
     alert(`Contribute to ${chama.name} coming soon!`);
   };
 
@@ -44,10 +47,13 @@ const ChamaCard = ({ chama }) => {
       <Card sx={{ mb: 2, borderRadius: 2 }}>
         <CardHeader title={chama.name} />
         <CardContent>
-          {/* Display on-chain data fields; use fallback text if a field is missing */}
+          {/* Display Chama details with formatted cycle duration */}
           <Typography variant="body2" color="text.secondary">
             <strong>Cycle:</strong> {chama.cycleDuration ? 
-              (Number(chama.cycleDuration) === 86400 ? "Daily" : Number(chama.cycleDuration) === 604800 ? "Weekly" : Number(chama.cycleDuration) === 2592000 ? "Monthly" : `${chama.cycleDuration} sec`) 
+              (Number(chama.cycleDuration) === 86400 ? "Daily" : 
+              Number(chama.cycleDuration) === 604800 ? "Weekly" : 
+              Number(chama.cycleDuration) === 2592000 ? "Monthly" : 
+              `${chama.cycleDuration} sec`) 
               : "N/A"}
           </Typography>
           <Typography variant="body2" color="text.secondary">
@@ -70,7 +76,7 @@ const ChamaCard = ({ chama }) => {
         </Box>
       </Card>
 
-      {/* Share Modal */}
+      {/* Share Modal for inviting members */}
       <Dialog open={shareModalOpen} onClose={() => setShareModalOpen(false)} fullWidth maxWidth="sm">
         <DialogTitle sx={{ fontWeight: "bold" }}>Invite Members to {chama.name}</DialogTitle>
         <DialogContent dividers>
@@ -102,7 +108,7 @@ const ChamaCard = ({ chama }) => {
               </IconButton>
             </Grid>
             <Grid item>
-              <IconButton color="primary" onClick={() => window.location.href = `mailto:?subject=Join%20Chama&body=${encodeURIComponent(shareUrl)}`}>
+              <IconButton color="primary" onClick={() => window.location.href = `mailto:?subject=Join%20Chama&body=${encodeURIComponent(shareUrl)}`}> 
                 <Email />
               </IconButton>
             </Grid>
@@ -115,6 +121,7 @@ const ChamaCard = ({ chama }) => {
         </DialogActions>
       </Dialog>
 
+      {/* Snackbar notification when URL is copied */}
       <Snackbar
         open={copySnackbarOpen}
         autoHideDuration={3000}

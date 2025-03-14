@@ -12,8 +12,7 @@ import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfi
 
 
 
-
-// Updated safe conversion to handle Ethers BigNumber
+// Function to safely convert values to strings
 const safeConvert = (val) => {
   if (val === null || val === undefined) return "";
   if (typeof val?._isBigNumber === "boolean") return val.toString();
@@ -22,6 +21,7 @@ const safeConvert = (val) => {
   return val;
 };
 
+// Converts cycle duration in seconds to human-readable format
 const formatCycleDuration = (duration) => {
   const d = Number(duration);
   if (d === 86400) return "Daily";
@@ -30,6 +30,7 @@ const formatCycleDuration = (duration) => {
   return `${d}`;
 };
 
+// Converts Wei to ETH for display purposes
 const convertWeiToEth = (weiValue) => {
   try {
     return formatUnits(weiValue, "ether");
@@ -39,6 +40,7 @@ const convertWeiToEth = (weiValue) => {
   }
 };
 
+// Formats Chama data into a structured object
 const formatChama = (chamaArray) => ({
   id: parseInt(safeConvert(chamaArray[0])),
   creator: safeConvert(chamaArray[1]),
@@ -66,6 +68,7 @@ const JoinChama = () => {
   const { walletProvider } = useAppKitProvider('eip155');
   const navigate = useNavigate();
 
+  // Fetches available Chamas from the blockchain
   useEffect(() => {
     const fetchChamas = async () => {
       if (!walletProvider) return;
@@ -78,9 +81,11 @@ const JoinChama = () => {
           ethersProvider
         );
 
+        // Get the total count of Chamas
         const count = await factoryContract.chamaCount();
         const chamaCount = parseInt(count.toString());
 
+        // Fetch details of each Chama
         const chamaPromises = [];
         for (let i = 1; i <= chamaCount; i++) {
           chamaPromises.push(factoryContract.chamas(i));
@@ -99,6 +104,7 @@ const JoinChama = () => {
     fetchChamas();
   }, [walletProvider]);
 
+  // Handles joining a Chama
   const handleJoin = async () => {
     if (!selectedChama || !walletProvider) return;
 
@@ -113,7 +119,7 @@ const JoinChama = () => {
         signer
       );
 
-      // Convert depositAmount back to wei
+      // Convert depositAmount back to wei before sending the transaction
       const value = parseUnits(selectedChama.depositAmount, "ether");
       
       const tx = await factoryContract.joinChama(selectedChama.id, { value });
@@ -164,54 +170,12 @@ const JoinChama = () => {
                 <Typography variant="h6" sx={{ fontWeight: "medium" }}>
                   {chama.name || "No Name"}
                 </Typography>
-                <Typography
-                  variant="body2"
-                  color="text.secondary"
-                  gutterBottom
-                  sx={{ mt: 1, mb: 2 }}
-                >
+                <Typography variant="body2" color="text.secondary" gutterBottom>
                   {chama.description || "No Description"}
                 </Typography>
-                <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
-                  <CalendarToday fontSize="small" color="action" />
-                  <Typography variant="body2">
-                    Cycle: {formatCycleDuration(chama.cycleDuration)}
-                  </Typography>
-                </Box>
-                <Box display="flex" alignItems="center" gap={1} sx={{ mb: 1 }}>
-                  <MonetizationOn fontSize="small" color="action" />
-                  <Typography variant="body2">
-                    Deposit: {chama.depositAmount} ETH
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Contribution: {chama.contributionAmount} ETH
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Penalty: {chama.penalty}%
-                  </Typography>
-                </Box>
-                <Box sx={{ mb: 1 }}>
-                  <Typography variant="body2">
-                    Max Members: {chama.maxMembers}
-                  </Typography>
-                </Box>
-                <Box>
-                  <Typography variant="body2">
-                    Members Joined: {chama.membersCount}
-                  </Typography>
-                </Box>
               </CardContent>
-              <CardActions sx={{ px: 2, pb: 2 }}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  fullWidth
-                  onClick={() => handleOpen(chama)}
-                >
+              <CardActions>
+                <Button variant="contained" color="primary" fullWidth onClick={() => handleOpen(chama)}>
                   Join
                 </Button>
               </CardActions>
@@ -219,84 +183,9 @@ const JoinChama = () => {
           </Grid>
         ))}
       </Grid>
-
-      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-        <Fade in={open} timeout={500}>
-          <Box>
-            <DialogTitle sx={{ fontWeight: "bold" }}>
-              {selectedChama?.name || "No Name"}
-            </DialogTitle>
-            <DialogContent dividers>
-              <Typography variant="body1" gutterBottom>
-                {selectedChama?.description || "No Description"}
-              </Typography>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Cycle Duration:
-                </Typography>
-                <Typography variant="body2">
-                  {formatCycleDuration(selectedChama?.cycleDuration)}
-                </Typography>
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Deposit Amount:
-                </Typography>
-                <Typography variant="body2">
-                  {selectedChama?.depositAmount} ETH
-                </Typography>
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Contribution Amount:
-                </Typography>
-                <Typography variant="body2">
-                  {selectedChama?.contributionAmount} ETH
-                </Typography>
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Penalty:
-                </Typography>
-                <Typography variant="body2">
-                  {selectedChama?.penalty}%
-                </Typography>
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Maximum Members:
-                </Typography>
-                <Typography variant="body2">
-                  {selectedChama?.maxMembers}
-                </Typography>
-              </Box>
-              <Box sx={{ mt: 2 }}>
-                <Typography variant="subtitle2" color="text.secondary">
-                  Members Joined:
-                </Typography>
-                <Typography variant="body2">
-                  {selectedChama?.membersCount}
-                </Typography>
-              </Box>
-            </DialogContent>
-            <DialogActions sx={{ px: 3, pb: 2 }}>
-              <Button onClick={handleClose} color="secondary">
-                Cancel
-              </Button>
-              <Button
-                variant="contained"
-                color="primary"
-                onClick={handleJoin}
-                disabled={joinLoading}
-              >
-                {joinLoading ? "Joining..." : "Confirm Join"}
-              </Button>
-            </DialogActions>
-          </Box>
-        </Fade>
-      </Dialog>
     </Container>
   );
 };
 
 export default JoinChama;
+

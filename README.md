@@ -89,7 +89,7 @@ Chama Dapp is a decentralized savings platform that revolutionizes traditional g
 
 ## Smart Contract Architecture
 
-The core of Chama Dapp is the **ChamaFactory** smart contract. Developed in Solidity (v0.8.26), it implements a decentralized savings model that automates the management of group savings with strict on-chain governance.
+The core of Chama Dapp is the [**ChamaFactory**](https://github.com/gethsun1/chama-dapp/blob/main/src/contracts/ChamaFactory.sol) smart contract. Developed in Solidity (v0.8.26), it implements a decentralized savings model that automates the management of group savings with strict on-chain governance.
 
 ### Key Functions & Sample Snippets
 

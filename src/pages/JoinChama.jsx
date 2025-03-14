@@ -8,9 +8,10 @@ import { MonetizationOn, Groups, CalendarToday } from "@mui/icons-material";
 import { Contract, BrowserProvider, formatUnits, parseUnits } from "ethers";
 import { useAppKitProvider } from '@reown/appkit/react';
 import { useNavigate } from "react-router-dom";
-import ChamaFactoryABI from "../contracts/ChamaFactoryABI.json";
+import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfig';
 
-const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
+
+
 
 // Updated safe conversion to handle Ethers BigNumber
 const safeConvert = (val) => {

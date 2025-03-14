@@ -25,10 +25,10 @@ import {
   useAppKitProvider,
 } from '@reown/appkit/react';
 import { Contract, BrowserProvider, parseUnits } from 'ethers';
-import ChamaFactoryABI from '../contracts/ChamaFactoryABI.json';
 import { useNavigate } from 'react-router-dom';
+import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfig';
 
-const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
+
 const EXPECTED_CHAIN_ID = 534351;
 
 const CreateChama = () => {

@@ -2,9 +2,10 @@
 import { useState, useEffect } from "react";
 import { BrowserProvider, Contract, formatUnits, getAddress } from "ethers";
 import { useAppKitAccount, useAppKitProvider } from "@reown/appkit/react";
-import ChamaFactoryABI from "../contracts/ChamaFactoryABI.json";
+import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfig';
 
-const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
+
+
 
 const useJoinedChamas = () => {
   const { isConnected, address } = useAppKitAccount();

@@ -142,9 +142,26 @@ const JoinChama = () => {
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-      <Typography variant="h4" gutterBottom sx={{ fontWeight: "bold", mb: 3 }}>
-        Available Chamas
-      </Typography>
+       
+<Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+  <Card
+    elevation={4}
+    sx={{
+      width: { xs: '90%', md: '60%' },
+      textAlign: 'center',
+      p: 3,
+      borderRadius: 2,
+      backgroundColor: 'background.paper',
+    }}
+  >
+    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+      Available Chamas
+    </Typography>
+    <Typography variant="subtitle1" color="text.secondary">
+      Join any that fits your interests & budget
+    </Typography>
+  </Card>
+</Box>
       <Grid container spacing={4}>
         {chamas.map((chama, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>

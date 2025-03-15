@@ -27,7 +27,7 @@ const ChatPlaceholder = () => {
 
       {/* Chat Placeholder Dialog */}
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>AI Assistant (Coming Soon)</DialogTitle>
+        <DialogTitle>AI Assistant (Coming Soon Chama Dapp AI Assistant)</DialogTitle>
         <DialogContent>
           <Typography variant="body1">
             Our AI assistant will soon be available to help guide you through Chama Dapp!

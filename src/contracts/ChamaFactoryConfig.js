@@ -1,6 +1,6 @@
 // src/contracts/ChamaFactoryConfig.js
 import ChamaFactoryABI from './ChamaFactoryABI.json';
 
-const contractAddress = "0x154d1E286A9A3c1d4B1e853A9a7e61b1e934B756";
+const contractAddress = "0xAb94b43880E7454B1979f0201DBe6dD39f0c78a1";
 
 export { ChamaFactoryABI, contractAddress };

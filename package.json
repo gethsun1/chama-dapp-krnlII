@@ -20,6 +20,7 @@
     "@react-native-community/netinfo": "^11.4.1",
     "@reown/appkit": "^1.6.9",
     "@reown/appkit-adapter-ethers": "^1.6.9",
+    "@sendgrid/mail": "^8.1.4",
     "date-fns": "2.x",
     "ethers": "^6.13.5",
     "fast-text-encoding": "^1.0.6",

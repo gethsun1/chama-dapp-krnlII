@@ -1,17 +1,17 @@
 // api/notify.js
 import sgMail from '@sendgrid/mail';
-import { readFileSync, existsSync } from 'fs';
+import { readFileSync, writeFileSync, existsSync } from 'fs';
 import path from 'path';
 
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 export default async function handler(req, res) {
-  // Set CORS headers to allow cross-origin requests
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  // Set CORS headers for preflight and actual requests
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST, OPTIONS");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
 
-  // Handle preflight requests
+  // Handle OPTIONS preflight request
   if (req.method === 'OPTIONS') {
     res.status(200).end();
     return;
@@ -22,7 +22,7 @@ export default async function handler(req, res) {
     return;
   }
 
-  // Expecting the request body to contain the new Chama details.
+  // Get the email and Chama details from the request body
   const {
     chamaName,
     description,
@@ -37,10 +37,10 @@ export default async function handler(req, res) {
     return;
   }
 
- 
+  // Read subscribers from the subscribers.json file located in the /api folder.
   const filePath = path.join(process.cwd(), 'api', 'subscribers.json');
   let subscribers = [];
-  
+
   if (existsSync(filePath)) {
     try {
       const data = readFileSync(filePath, 'utf-8');
@@ -59,13 +59,12 @@ export default async function handler(req, res) {
 
   const joinChamaUrl = 'https://chama-dapp.vercel.app/join-chama';
 
-  // Prepare the email message for all subscribers.
   const msg = {
     to: subscribers,
-    from: process.env.SENDGRID_FROM_EMAIL, 
+    from: process.env.SENDGRID_FROM_EMAIL, // Your verified sender email (e.g., chamadapp01@gmail.com)
     subject: `New Chama Created: ${chamaName}`,
     text: `A new Chama has been created!
-    
+
 Chama Name: ${chamaName}
 Description: ${description}
 Deposit Amount: ${depositAmount} ETH

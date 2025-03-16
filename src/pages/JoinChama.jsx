@@ -6,13 +6,11 @@ import {
 } from "@mui/material";
 import { MonetizationOn, Groups, CalendarToday } from "@mui/icons-material";
 import { Contract, BrowserProvider, formatUnits, parseUnits } from "ethers";
-import { useAppKitProvider } from '@reown/appkit/react';
+import { useAppKitProvider, useAppKitAccount } from "@reown/appkit/react";
 import { useNavigate } from "react-router-dom";
-import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfig';
+import { ChamaFactoryABI, contractAddress } from "../contracts/ChamaFactoryConfig";
 
-
-
-// Updated safe conversion to handle Ethers BigNumber
+// Helper function for safe conversion
 const safeConvert = (val) => {
   if (val === null || val === undefined) return "";
   if (typeof val?._isBigNumber === "boolean") return val.toString();
@@ -26,7 +24,7 @@ const formatCycleDuration = (duration) => {
   if (d === 86400) return "Daily";
   if (d === 604800) return "Weekly";
   if (d === 2592000) return "Monthly";
-  return `${d}`;
+  return `${d} sec`;
 };
 
 const convertWeiToEth = (weiValue) => {
@@ -61,14 +59,21 @@ const JoinChama = () => {
   const [chamas, setChamas] = useState([]);
   const [loading, setLoading] = useState(true);
   const [joinLoading, setJoinLoading] = useState(false);
-  
-  const { walletProvider } = useAppKitProvider('eip155');
+
+  // Get wallet connection status using AppKit hooks
+  const { walletProvider } = useAppKitProvider("eip155");
+  const { isConnected, address } = useAppKitAccount();
   const navigate = useNavigate();
 
   useEffect(() => {
+    // If wallet is not connected, stop loading and prompt user
+    if (!isConnected) {
+      setLoading(false);
+      return;
+    }
+
     const fetchChamas = async () => {
       if (!walletProvider) return;
-
       try {
         const ethersProvider = new BrowserProvider(walletProvider);
         const factoryContract = new Contract(
@@ -76,7 +81,6 @@ const JoinChama = () => {
           ChamaFactoryABI,
           ethersProvider
         );
-
         const count = await factoryContract.chamaCount();
         const chamaCount = parseInt(count.toString());
 
@@ -96,7 +100,7 @@ const JoinChama = () => {
     };
 
     fetchChamas();
-  }, [walletProvider]);
+  }, [walletProvider, isConnected]);
 
   const handleJoin = async () => {
     if (!selectedChama || !walletProvider) return;
@@ -105,18 +109,18 @@ const JoinChama = () => {
       setJoinLoading(true);
       const ethersProvider = new BrowserProvider(walletProvider);
       const signer = await ethersProvider.getSigner();
-      
       const factoryContract = new Contract(
         contractAddress,
         ChamaFactoryABI,
         signer
       );
-
-      // Convert depositAmount back to wei
+      // Convert depositAmount back to wei (from ETH displayed)
       const value = parseUnits(selectedChama.depositAmount, "ether");
-      
+
       const tx = await factoryContract.joinChama(selectedChama.id, { value });
+      console.log("[TX SENT] Hash:", tx.hash);
       await tx.wait();
+      console.log("[TX CONFIRMED]");
       handleClose();
       
       // Redirect to Dashboard after successful join
@@ -138,30 +142,40 @@ const JoinChama = () => {
     setSelectedChama(null);
   };
 
+  // If loading is true, show a loading message; if wallet is not connected, prompt to connect
   if (loading) return <div>Loading...</div>;
+  if (!isConnected)
+    return (
+      <Container sx={{ mt: 4, mb: 4, textAlign: "center" }}>
+        <Typography variant="h6" color="error">
+          Please connect your wallet to view available Chamas.
+        </Typography>
+      </Container>
+    );
 
   return (
     <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-       
-<Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
-  <Card
-    elevation={4}
-    sx={{
-      width: { xs: '90%', md: '60%' },
-      textAlign: 'center',
-      p: 3,
-      borderRadius: 2,
-      backgroundColor: 'background.paper',
-    }}
-  >
-    <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
-      Available Chamas
-    </Typography>
-    <Typography variant="subtitle1" color="text.secondary">
-      Join any that fits your interests & budget
-    </Typography>
-  </Card>
-</Box>
+      {/* Elegant Header */}
+      <Box sx={{ display: 'flex', justifyContent: 'center', mb: 4 }}>
+        <Card
+          elevation={4}
+          sx={{
+            width: { xs: '90%', md: '60%' },
+            textAlign: 'center',
+            p: 3,
+            borderRadius: 2,
+            backgroundColor: 'background.paper',
+          }}
+        >
+          <Typography variant="h4" sx={{ fontWeight: 'bold', mb: 1 }}>
+            Available Chamas
+          </Typography>
+          <Typography variant="subtitle1" color="text.secondary">
+            Join any that fits your interests & budget
+          </Typography>
+        </Card>
+      </Box>
+      
       <Grid container spacing={4}>
         {chamas.map((chama, index) => (
           <Grid item xs={12} sm={6} md={4} key={index}>

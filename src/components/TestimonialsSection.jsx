@@ -5,7 +5,7 @@ import Slider from "react-slick";
 import "slick-carousel/slick/slick.css"; 
 import "slick-carousel/slick/slick-theme.css";
 
-// Import your assets
+// Assets Import
 import community1 from '../assets/community1.jpg';
 import member1 from '../assets/member1.jpg';
 import community2 from '../assets/community2.jpg';

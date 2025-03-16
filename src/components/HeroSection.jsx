@@ -107,7 +107,7 @@ const HeroSection = () => {
                         <li>💡 Mismanagement or even misappropriation of funds by administrators</li>
                       </ul>
                       <br />
-                      Chama DApp addresses these issues by bringing the entire process on-chain. Using smart contracts, it enforces contribution rules (with penalty for defaults) and implements member-driven governance, ensuring that every participant has a voice and that funds are managed transparently.
+                      Chama DApp addresses these issues by bringing the entire process on-chain. Using smart contracts & Blockchain Technology, it enforces contribution rules (with penalty for defaults) and implements member-driven governance, ensuring that every participant has a voice and that funds are managed transparently.
                       <br /><br />
                       This digital transformation of the ROSCA model not only preserves the core benefits of community-based savings but also introduces enhanced security, accountability, and efficiency to empower communities financially.
                     </Typography>

@@ -23,4 +23,3 @@ main()
     console.error(error);
     process.exit(1);
   });                                                                                                                                                                                                                                                                                                                                                                                                                                                         
-git

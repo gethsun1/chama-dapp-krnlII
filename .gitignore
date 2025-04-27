@@ -11,6 +11,20 @@ node_modules
 dist
 dist-ssr
 *.local
+.env
+.env.local
+.env.development
+.env.production
+.env.test
+
+# Hardhat files
+cache/
+artifacts/
+typechain-types/
+
+# Coverage files
+coverage/
+coverage.json
 
 # Editor directories and files
 .vscode/*
@@ -23,5 +37,4 @@ dist-ssr
 *.sln
 *.sw?
 core
-*.env
 .vercel

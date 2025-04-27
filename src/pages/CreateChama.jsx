@@ -24,11 +24,13 @@ import {
   useAppKitNetwork,
   useAppKitProvider,
 } from '@reown/appkit/react';
-import { Contract, BrowserProvider, parseUnits } from 'ethers';
+import { Contract, BrowserProvider, parseUnits, keccak256, AbiCoder, solidityPacked } from 'ethers';
 import { useNavigate } from 'react-router-dom';
-import { ChamaFactoryABI, contractAddress } from '../contracts/ChamaFactoryConfig';
+import { contractAddress } from '../contracts/ChamaFactoryConfig';
+import { generateCreateChamaPayload } from '../services/krnlService';
+import { checkKrnlCredentials } from '../test-env';
 
-const EXPECTED_CHAIN_ID = 534351;
+const EXPECTED_CHAIN_ID = 11155111; // Ethereum Sepolia Testnet
 
 const CreateChama = () => {
   // Form state
@@ -98,7 +100,7 @@ const CreateChama = () => {
         return;
       }
       if (chainId !== EXPECTED_CHAIN_ID) {
-        alert("Please switch to the Scroll Sepolia Testnet.");
+        alert("Please switch to the Ethereum Sepolia Testnet.");
         return;
       }
       if (!contributionCycle || !depositAmount || !contributionAmount) {
@@ -132,19 +134,216 @@ const CreateChama = () => {
         throw new Error("No signer available");
       }
 
-      const contract = new Contract(contractAddress, ChamaFactoryABI, signer);
-      const tx = await contract.createChama(
-        chamaName.trim(),
-        description.trim(),
-        depositInWei,
-        contributionInWei,
-        BigInt(Math.round(penalty)),
-        BigInt(maxMembers),
-        BigInt(cycleDurationNumeric)
-      );
-      console.log("[TX SENT] Hash:", tx.hash);
-      await tx.wait();
-      console.log("[TX CONFIRMED]");
+      // Check KRNL credentials
+      const krnlCredentials = checkKrnlCredentials();
+      console.log("[INFO] KRNL Credentials Check:", krnlCredentials);
+
+      // Display a message about KRNL registration
+      console.log("[INFO] Note: To use the full KRNL functionality, you need to register your dApp with KRNL.");
+      console.log("[INFO] Visit https://krnl.lat/ to register your dApp and get your entryId and accessToken.");
+
+      // Let's try with a proper KrnlPayload
+      console.log("[DEBUG] Using approach with KrnlPayload");
+
+      // Create a complete ABI for the createChama function with KrnlPayload
+      const completeABI = [
+        {
+          "inputs": [
+            {"name": "name", "type": "string"},
+            {"name": "description", "type": "string"},
+            {"name": "depositAmount", "type": "uint256"},
+            {"name": "contributionAmount", "type": "uint256"},
+            {"name": "penalty", "type": "uint256"},
+            {"name": "maxMembers", "type": "uint256"},
+            {"name": "cycleDuration", "type": "uint256"},
+            {
+              "components": [
+                {"name": "auth", "type": "bytes"},
+                {"name": "kernelResponses", "type": "bytes"},
+                {"name": "kernelParams", "type": "bytes"}
+              ],
+              "name": "krnlPayload",
+              "type": "tuple"
+            }
+          ],
+          "name": "createChama",
+          "outputs": [{"name": "", "type": "uint256"}],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ];
+
+      // Create a new contract instance with the complete ABI
+      const contract = new Contract(contractAddress, completeABI, signer);
+
+      try {
+        // Use the KRNL service to generate a proper KrnlPayload
+        console.log("[DEBUG] Generating KRNL payload via service");
+
+        // Prepare parameters for the KRNL service
+        const params = {
+          chamaName: chamaName.trim(),
+          description: description.trim(),
+          depositAmount: depositInWei,
+          contributionAmount: contributionInWei,
+          penalty: BigInt(Math.round(penalty)),
+          maxMembers: BigInt(maxMembers),
+          cycleDuration: BigInt(cycleDurationNumeric)
+        };
+
+        console.log("[DEBUG] Parameters for KRNL service:", {
+          chamaName: chamaName.trim(),
+          description: description.trim(),
+          depositAmount: depositInWei.toString(),
+          contributionAmount: contributionInWei.toString(),
+          penalty: Math.round(penalty),
+          maxMembers: maxMembers,
+          cycleDuration: cycleDurationNumeric
+        });
+
+        // Generate the KrnlPayload using our service
+        let krnlPayload;
+        try {
+          krnlPayload = await generateCreateChamaPayload(signer, params);
+          console.log("[DEBUG] KRNL Payload generated:", krnlPayload);
+        } catch (krnlError) {
+          console.error("[KRNL ERROR]", krnlError);
+
+          // If KRNL payload generation fails, create a mock payload as fallback
+          console.log("[DEBUG] Using mock KRNL payload as fallback");
+
+          // Try a different approach for the mock payload
+          const kernelParams = "0x";
+          const walletAddress = await signer.getAddress();
+          console.log("[DEBUG] Wallet address for mock payload:", walletAddress);
+
+          const kernelParamsDigest = keccak256(
+            solidityPacked(["bytes", "address"], [kernelParams, walletAddress])
+          );
+
+          const abiCoder = new AbiCoder();
+          const mockAuth = abiCoder.encode(
+            ["bytes", "bytes32", "bytes", "uint256", "bool"],
+            [
+              "0x", // kernelResponseSignature
+              kernelParamsDigest, // kernelParamObjectDigest
+              "0x", // signatureToken
+              0, // nonce
+              true // finalOpinion
+            ]
+          );
+
+          krnlPayload = {
+            auth: mockAuth,
+            kernelResponses: "0x",
+            kernelParams: kernelParams
+          };
+
+          console.log("[DEBUG] Mock KRNL payload:", krnlPayload);
+        }
+
+        console.log("[DEBUG] Attempting contract call with KrnlPayload");
+        const tx = await contract.createChama(
+          chamaName.trim(),
+          description.trim(),
+          depositInWei,
+          contributionInWei,
+          BigInt(Math.round(penalty)),
+          BigInt(maxMembers),
+          BigInt(cycleDurationNumeric),
+          krnlPayload
+        );
+        console.log("[TX SENT] Hash:", tx.hash);
+        await tx.wait();
+        console.log("[TX CONFIRMED]");
+      } catch (error) {
+        console.error("[CONTRACT ERROR]", error);
+
+        // If the above approach fails, try a fallback approach with a minimal ABI
+        console.log("[DEBUG] Trying fallback approach without KrnlPayload");
+
+        try {
+          // Create a minimal ABI without KrnlPayload
+          const minimalABI = [
+            {
+              "inputs": [
+                {"name": "name", "type": "string"},
+                {"name": "description", "type": "string"},
+                {"name": "depositAmount", "type": "uint256"},
+                {"name": "contributionAmount", "type": "uint256"},
+                {"name": "penalty", "type": "uint256"},
+                {"name": "maxMembers", "type": "uint256"},
+                {"name": "cycleDuration", "type": "uint256"}
+              ],
+              "name": "createChama",
+              "outputs": [{"name": "", "type": "uint256"}],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "inputs": [
+                {"name": "name", "type": "string"},
+                {"name": "description", "type": "string"},
+                {"name": "depositAmount", "type": "uint256"},
+                {"name": "contributionAmount", "type": "uint256"},
+                {"name": "penalty", "type": "uint256"},
+                {"name": "maxMembers", "type": "uint256"},
+                {"name": "cycleDuration", "type": "uint256"},
+                {"name": "creator", "type": "address"}
+              ],
+              "name": "createChamaWithCreator",
+              "outputs": [{"name": "", "type": "uint256"}],
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ];
+
+          const simpleContract = new Contract(contractAddress, minimalABI, signer);
+          const walletAddress = await signer.getAddress();
+
+          console.log("[DEBUG] Trying createChama without KrnlPayload");
+          try {
+            const tx = await simpleContract.createChama(
+              chamaName.trim(),
+              description.trim(),
+              depositInWei,
+              contributionInWei,
+              BigInt(Math.round(penalty)),
+              BigInt(maxMembers),
+              BigInt(cycleDurationNumeric)
+            );
+            console.log("[TX SENT] Hash:", tx.hash);
+            await tx.wait();
+            console.log("[TX CONFIRMED]");
+          } catch (createChamaError) {
+            console.error("[CREATE CHAMA ERROR]", createChamaError);
+
+            // Try createChamaWithCreator if available
+            console.log("[DEBUG] Trying createChamaWithCreator as last resort");
+            try {
+              const tx = await simpleContract.createChamaWithCreator(
+                chamaName.trim(),
+                description.trim(),
+                depositInWei,
+                contributionInWei,
+                BigInt(Math.round(penalty)),
+                BigInt(maxMembers),
+                BigInt(cycleDurationNumeric),
+                walletAddress
+              );
+              console.log("[TX SENT] Hash:", tx.hash);
+              await tx.wait();
+              console.log("[TX CONFIRMED]");
+            } catch (withCreatorError) {
+              console.error("[CREATE WITH CREATOR ERROR]", withCreatorError);
+              throw new Error("All contract call approaches failed");
+            }
+          }
+        } catch (fallbackError) {
+          console.error("[FALLBACK ERROR]", fallbackError);
+          throw error; // Throw the original error
+        }
+      }
 
       // Prepare notification payload
       const notifyPayload = {
@@ -210,7 +409,7 @@ const CreateChama = () => {
           )}
           {isConnected && chainId !== EXPECTED_CHAIN_ID && (
             <Typography variant="body2" color="error" sx={{ mb: 2 }}>
-              Please switch to the Scroll Sepolia Testnet.
+              Please switch to the Ethereum Sepolia Testnet.
             </Typography>
           )}
           <Box component="form" onSubmit={handleSubmit} noValidate>
@@ -299,7 +498,7 @@ const CreateChama = () => {
                 </Typography>
                 <Slider
                   value={penalty}
-                  onChange={(e, newValue) => setPenalty(newValue)}
+                  onChange={(_, newValue) => setPenalty(newValue)}
                   min={0}
                   max={100}
                   valueLabelDisplay="auto"

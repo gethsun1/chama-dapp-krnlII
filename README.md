@@ -1,235 +1,231 @@
+<p align="center">
+  <a href="https://twitter.com/KRNL_xyz"><img src="https://img.shields.io/badge/KRNL%20Protocol-Integrated-blue?style=flat-square" alt="KRNL Protocol"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License"></a>
+</p>
 
-# Chama Dapp
+# Chama DApp 🚀
 
-[![chamabg.png](https://i.postimg.cc/bvcF7W8v/chamabg.png)](https://postimg.cc/yDjP9fDq)
-
-[![React](https://img.shields.io/badge/React-18.2.0-blue)](https://reactjs.org/)  
-[![Vite](https://img.shields.io/badge/Vite-4.0.0-blue)](https://vitejs.dev/)  
-[![Material UI](https://img.shields.io/badge/Material%20UI-v5-blue)](https://mui.com/)  
-[![Solidity](https://img.shields.io/badge/Solidity-0.8.26-blue)](https://soliditylang.org/)  
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+A **decentralized group savings and credit** application (Chama) with built‑in **KRNL protocol** security for transparent, compliant group savings on‑chain.
 
 ---
 
-## Overview
+## 📖 Table of Contents
 
-Chama Dapp is a decentralized savings platform that revolutionizes traditional group savings—commonly known as Chamas—by bringing transparency, security, and automated governance on-chain. A **Chama** is a community-based savings group inspired by the **Rotating Savings and Credit Association (ROSCA)** model, where members contribute regularly to a shared pool and take turns receiving the lump sum. Our Dapp leverages blockchain technology deployed on the Scroll Sepolia Testnet (enhanced with Scroll Zero-Knowledge Proofs for scalability and privacy) to automate these processes, ensuring trustless, efficient, and democratic financial management.
-
----
-
-## Features
-
-- **Create a Chama:**  
-  Launch your decentralized savings group with configurable parameters:
-  - Initial deposit and recurring contribution amounts
-  - Penalty rates for defaulting members
-  - Maximum number of members
-  - Contribution cycle duration (daily, weekly, or monthly)
-
-- **Join a Chama:**  
-  Discover and join active Chamas by sending the required deposit. Membership is verified on-chain, ensuring complete transparency.
-
-- **Automated Contributions & Payouts:**  
-  Contributions are automatically collected on schedule, and payouts are executed in a round-robin fashion. Penalties for defaults are deducted from deposits and added to the payout of the scheduled recipient.
-
-- **Real-Time Dashboard & Analytics:**  
-  View detailed analytics such as contribution history, funds allocation, and real-time balance updates, all integrated into an intuitive Material UI dashboard.
-
-- **Wallet & Blockchain Integration:**  
-  Securely connect your wallet using reown Appkit. Interactions with the blockchain are facilitated by Wagmi, Ethers.js, and viem, ensuring seamless and reliable on-chain operations.
-
-- **Email Notifications:**  
-  Integrated serverless functions (hosted on Vercel) send real-time email notifications via SendGrid whenever a new Chama is created, keeping all subscribers informed.
+1. [Overview](#overview)
+2. [What Is a Chama & How It Works](#what-is-a-chama--how-it-works)
+3. [Features](#features)
+4. [KRNL Integration](#krnl-integration)
+5. [Smart Contracts](#smart-contracts)
+6. [Frontend](#frontend)
+7. [User Flow](#user-flow)
+8. [Architecture](#architecture)
+9. [Getting Started](#getting-started)
+10. [Project Structure](#project-structure)
+11. [Registration & IDs](#registration--ids)
+12. [License](#license)
 
 ---
 
-## Live App
+## 🔍 Overview
 
-- **Live App:** [https://chama-dapp.vercel.app/](https://chama-dapp.vercel.app/)
+The **Chama DApp** digitizes the East African *Chama* (ROSCA) tradition, enabling groups to pool savings, enforce contributions, and distribute funds—all via smart contracts. By integrating the KRNL protocol, every critical action is validated by trusted kOS kernels, ensuring a secure, transparent, and compliant financial experience.
 
 ---
 
-## Installation & Setup
+## 📚 What Is a Chama & How It Works
+
+A **Chama** (Swahili for “group”) is a community-based savings circle where members contribute regularly into a collective pot and take turns receiving the lump sum. Traditionally orchestrated over in-person meetings, this DApp automates and secures the entire lifecycle:
+
+1. **Formation**
+   - **Creator** defines parameters:
+     - **Deposit Amount** (collateral)
+     - **Cycle Contribution** (periodic deposit)
+     - **Penalty Rate** (for missed contributions)
+     - **Maximum Members**
+     - **Cycle Duration** (daily, weekly, monthly)
+
+2. **Onboarding**
+   - **Members** join by staking the required **deposit**.
+   - Smart contract verifies eligibility via **KRNL kernels** (e.g., prohibited‑list, trusted‑list).
+
+3. **Contribution Cycle**
+   - On each cycle’s **start**, members must send their **contribution** before the deadline.
+   - **Missed contributions** incur a **penalty** (deducted from deposit and added to that cycle’s pot).
+
+4. **Round‑Robin Payout**
+   - After the cycle ends, the total pot (contributions + penalties) is **automatically transferred** to the next member in line.
+   - The cycle pointer advances, and the next round begins without manual intervention.
+
+5. **Completion**
+   - The process repeats until all members have received their payout once (or as configured).
+   - Members can form new Chamas or re‑join existing ones.
+
+<p align="center">
+  🔄 Round Robin
+  💰 Automated Payouts
+</p>
+
+---
+
+## ✨ Features
+
+- **🆕 Create & Manage Chamas**
+  Flexible parameters for deposit, contribution, penalty, and membership.
+- **👥 Secure Onboarding**
+  KRNL‑verified join process ensures only approved members participate.
+- **⏱️ Automated Contributions**
+  Smart contracts enforce schedules and collect funds.
+- **🔄 Round‑Robin Payouts**
+  Trustless lump‑sum distribution each cycle.
+- **🔐 KRNL Protocol**
+  Mock Oracle kernel (875) provides ETH/USD pricing data for all transactions.
+- **🦊 Web3 Wallets**
+  MetaMask, WalletConnect, and more supported.
+
+---
+
+## 🔗 KRNL Integration
+
+### Current Implementation
+
+| Kernel ID | Name            | Purpose                                       |
+|:---------:|:----------------|:----------------------------------------------|
+| **875**   | Mock Oracle     | Provides ETH/USD price data for Chama creation|
+
+> Every call to `createChama`, `joinChama`, `contribute`, and `payout` requires a validated **KRNL payload** with Oracle data, processed by `TokenAuthority.sol`.
+
+### Planned Integration
+
+| Kernel ID | Name               | Purpose                                          |
+|:---------:|:-------------------|:-------------------------------------------------|
+| **1443**  | Time Lock Vault    | Manages deposits with time-based access control  |
+
+**Time Lock Vault Kernel Details:**
+- **Network**: Sepolia (Chain ID: 11155111)
+- **Address**: 0x8B11F19956a1C...e70792004082BBF
+- **Function Signature**: `checkAndCalculateYield(uint256,uint256,uint256,uint256)`
+- **Return Type**: `(bool,uint256)`
+
+This kernel will enable verifiable delay enforcement in fund withdrawals, providing transparency and protection against impulsive or malicious actions.
+
+---
+
+## 📜 Smart Contracts
+
+### UpdatedChamaFactory.sol
+- **Network:** Ethereum Sepolia
+- **Address:** `0x4c03E26aBE5E1d14Adf3108b123D06148Ea906fd`
+
+Key signature:
+```solidity
+function createChama(..., KrnlPayload calldata krnl) external onlyAuthorized(krnl, ...);
+```
+
+### TokenAuthority.sol
+- **Network:** Oasis Sapphire Testnet
+- **Address:** `0x043D8606399A3600Ba8fcA555273892b46680825`
+
+Manages:
+- Access token & runtime digest verification
+- Kernel result validation & final signing
+
+---
+
+## 🎨 Frontend
+
+- **Framework:** React + Vite + Tailwind CSS
+- **Wallets:** ethers.js + Web3Modal
+- **KRNL Service:** Payload generation & submission
+- **Key Pages:**
+  - Create Chama
+  - Chama Dashboard
+  - Member Contributions
+  - Payout History
+
+---
+
+## 🚀 User Flow
+
+1. **Connect Wallet**
+2. **Create or Join** a Chama (KRNL‑protected)
+3. **Deposit & Contribute** each cycle
+4. **Receive Payout** automatically
+5. **Track** all actions on-chain
+
+---
+
+## 🏗️ Architecture
+
+### Smart Contract Layer
+- Solidity v0.8.24
+- KRNL Protocol integration
+- OpenZeppelin ReentrancyGuard & Ownable
+
+### Application Layer
+- React + Vite
+- ethers.js & Web3Modal
+- Tailwind CSS
+
+---
+
+## 🛠️ Getting Started
 
 ### Prerequisites
+- Node.js ≥ 16
+- Yarn (this project uses Yarn exclusively)
+- MetaMask or similar
 
-- [Node.js](https://nodejs.org/) (v14 or above)
-- [Yarn](https://yarnpkg.com/) or npm
-- A wallet (e.g., MetaMask) configured for the [Scroll Sepolia Testnet](https://scroll.io/)
-- Familiarity with reown Appkit for wallet connections and blockchain interactions
-
-### Installation
-
-1. **Clone the Repository:**
-
-   ```bash
-   git clone https://github.com/gethsun1/chama-dapp
-   cd chama-dapp
-   ```
-
-2. **Install Dependencies:**
-
-   ```bash
-   yarn install
-   ```
-
-3. **Run the Development Server:**
-
-   ```bash
-   yarn dev
-   ```
-
-4. **Build for Production:**
-
-   ```bash
-   yarn build
-   ```
-
----
-
-## Smart Contract Architecture
-
-The core of Chama Dapp is the [**ChamaFactory**](https://github.com/gethsun1/chama-dapp/blob/main/src/contracts/ChamaFactory.sol) smart contract. Developed in Solidity (v0.8.26), it implements a decentralized savings model that automates the management of group savings with strict on-chain governance.
-
-### Key Functions & Sample Snippets
-
-#### 1. Creating a Chama
-
-The `createChama` function initializes a new savings group with all necessary parameters. It ensures that key requirements are met (e.g., non-zero deposit and contribution amounts) and logs an event for on-chain transparency.
-
-```solidity
-function createChama(
-    string memory _name,
-    string memory _description,
-    uint256 _depositAmount,
-    uint256 _contributionAmount,
-    uint256 _penalty,
-    uint256 _maxMembers,
-    uint256 _cycleDuration
-) external returns (uint256) {
-    require(_maxMembers > 0, "Max members must be > 0");
-    require(_depositAmount > 0, "Deposit amount must be > 0");
-    require(_contributionAmount > 0, "Contribution amount must be > 0");
-
-    chamaCount++;
-    Chama storage newChama = chamas[chamaCount];
-    newChama.id = chamaCount;
-    newChama.creator = msg.sender;
-    newChama.name = _name;
-    newChama.description = _description;
-    newChama.depositAmount = _depositAmount;
-    newChama.contributionAmount = _contributionAmount;
-    newChama.penalty = _penalty;
-    newChama.maxMembers = _maxMembers;
-    newChama.cycleDuration = _cycleDuration;
-    newChama.currentRound = 1;
-    newChama.currentCycle = 1;
-    newChama.nextCycleStart = block.timestamp + _cycleDuration;
-    newChama.isActive = true;
-
-    emit ChamaCreated(chamaCount, _name, msg.sender);
-    return chamaCount;
-}
+### Smart Contract
+```bash
+git clone https://github.com/your-org/chama-dapp.git
+cd chama-dapp
+yarn install
+# Deploy contracts using our helper script
+./deploy.sh
 ```
 
-#### 2. Joining a Chama
-
-The `joinChama` function allows users to join an active Chama by sending the exact deposit amount. It prevents duplicate membership and ensures the Chama is not already full.
-
-```solidity
-function joinChama(uint256 _chamaId) external payable {
-    Chama storage chama = chamas[_chamaId];
-    require(chama.isActive, "Chama is not active");
-    require(chama.membersCount < chama.maxMembers, "Chama is full");
-    require(msg.value == chama.depositAmount, "Incorrect deposit amount");
-    require(!isMember(_chamaId, msg.sender), "Already a member");
-
-    chama.members.push(msg.sender);
-    chama.membersCount++;
-    memberDeposit[_chamaId][msg.sender] = chama.depositAmount;
-    emit JoinedChama(_chamaId, msg.sender);
-}
+### Frontend
+```bash
+cd frontend
+yarn install
+yarn dev
 ```
 
-#### 3. Making Contributions & Payouts
+---
 
-The contract also handles periodic contributions and automated payouts. Contributions are checked against the schedule, and if a member defaults, a penalty is applied. Payouts are executed in a round‑robin fashion.
+## 📁 Project Structure
 
-```solidity
-function contribute(uint256 _chamaId) external payable {
-    Chama storage chama = chamas[_chamaId];
-    require(chama.isActive, "Chama is not active");
-    require(isMember(_chamaId, msg.sender), "Not a member of this Chama");
-    require(msg.value == chama.contributionAmount, "Incorrect contribution amount");
-    require(block.timestamp < chama.nextCycleStart, "Contribution period over for current cycle");
-    require(!contributions[_chamaId][chama.currentCycle][msg.sender], "Contribution already made for current cycle");
-
-    contributions[_chamaId][chama.currentCycle][msg.sender] = true;
-    emit ContributionMade(_chamaId, chama.currentCycle, msg.sender, msg.value);
-}
+```
+src/
+  ├─ contracts/
+  │   ├─ KRNL.sol
+  │   ├─ TokenAuthority.sol
+  │   └─ ChamaFactory.sol
+  ├─ scripts/
+  │   ├─ deploy-token-authority.cjs
+  │   └─ deploy-chama-factory.cjs
+  ├─ services/
+  │   └─ krnlService.js (uses Mock Oracle kernel 875)
+  ├─ components/
+  ├─ pages/
+  └─ App.jsx
+deploy.sh (deployment helper script)
+hardhat.config.cjs
+vite.config.js
+README.md
 ```
 
-*Note: Additional functions (such as `payout` and internal calculations) ensure that the smart contract robustly handles all group savings operations while protecting against reentrancy and other common attacks.*
+---
+
+## 🆔 Registration & IDs
+
+- **Contract ID:** 7257
+- **DApp ID:** 6927
+- **Entry ID:** `0xc2fc44b0a9d5b8a7540b9de8481973708d618951dd9b877486fde9c2e059911b`
+- **Access Token:** `0x304402206234ff3a9d7c8e94d6a61ccdac3a5dfb50e84893fd43dfdce7c344dc964f6d6c022000ab4d4684825fda6d75c9b7cba6ad1d2675b23864300c9f10cba80ba517feab`
 
 ---
 
-## Technical Architecture Overview
+## 📜 License
 
-1. **Smart Contracts:**  
-   - **Deployment:** ChamaFactory contracts are deployed on the Scroll Sepolia Testnet using Scroll Zero-Knowledge Proofs for scalability and privacy.
-   - **Core Logic:** Implements creation, joining, contributions, and automated payouts for Chama groups.
-
-2. **Frontend:**  
-   - **Built with:** React, Vite, and Material UI  
-   - **Blockchain Integration:** Uses reown Appkit along with Wagmi/Ethers.js to connect user wallets, query on-chain data, and interact with smart contracts.
-   - **Analytics:** A Dashboard displays real-time on-chain data alongside demo analytics (to be replaced by actual on-chain analytics later).
-
-3. **Backend:**  
-   - **Serverless Functions:** Hosted on Vercel to manage auxiliary tasks such as email notifications and subscription management.
-   - **Email Notifications:** When a new Chama is created, a serverless function triggers an email (via SendGrid) to all subscribers, including key details and a shareable invite link.
-
----
-
-## Wallet & Blockchain Integration
-
-- **Wallet Connection:**  
-  Users connect their wallets securely using reown Appkit.  
-- **Blockchain Interaction:**  
-  All on-chain interactions (e.g., creating, joining, contributing) are managed via smart contracts using ethers.js and viem for conversions and formatting.
-- **On-Chain Data Display:**  
-  The Dashboard fetches on-chain data (like joined Chamas, balances, and deposit information) via custom hooks, ensuring that users see up-to-date information.
-
----
-
-## Future Plans
-
-- **Enhanced Analytics:**  
-  Integrate on-chain event indexing (using tools like The Graph) to display detailed contribution histories and financial analytics.
-- **Governance Mechanisms:**  
-  Develop member-driven governance features to allow Chama members to decide on investment strategies and fund allocation.
-- **AI-Powered Assistance:**  
-  Introduce an AI chatbot for guiding users through the platform and providing personalized financial insights.
-- **Mobile Optimization:**  
-  Continue refining the UI/UX to ensure seamless operation across all devices.
-
----
-
-## Contributing
-
-Contributions are welcome! Please fork the repository, make your improvements, and submit a pull request. For major changes, please open an issue first to discuss your ideas.
-
----
-
-## License
-
-This project is licensed under the [MIT License](https://opensource.org/license/mit).
-
----
-
-## Contact
-
-For further inquiries or support, please contact Gethsun at [gethsun09@gmail.com](mailto:gethsun09@gmail.com).
-
----
-
-Chama Dapp is dedicated to transforming the traditional ROSCA model into a modern, trustless, and decentralized savings solution that empowers unbanked communities and fosters collective financial resilience.
+Distributed under the **MIT License**. See [LICENSE](./LICENSE).

@@ -1,10 +1,10 @@
 // src/config.jsx
 import { createAppKit } from '@reown/appkit/react';
 import { EthersAdapter } from '@reown/appkit-adapter-ethers';
-import { scrollSepolia, scroll } from '@reown/appkit/networks';
+import { sepolia } from '@reown/appkit/networks';
 
 const projectId = '3268c03bffd8e52c1b26452048d2ce4c';
-const networks = [scrollSepolia, scroll];
+const networks = [sepolia];
 
 const metadata = {
   name: 'Chama Dapp v2',

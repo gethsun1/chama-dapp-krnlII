@@ -177,7 +177,7 @@ Manages:
 
 ### Smart Contract
 ```bash
-git clone https://github.com/your-org/chama-dapp.git
+git clone https://github.com/gethsun1/chama-dapp-krnlII
 cd chama-dapp
 yarn install
 # Deploy contracts using our helper script
